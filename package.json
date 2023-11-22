@@ -1,0 +1,15 @@
+{
+  "name": "dt0162g-projekt-maka2207",
+  "version": "1.0.0",
+  "description": "Projektuppgiften i HT2023 DT162G Datateknik GR (B), Javascriptbaserad webbutveckling av maka2207",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "WebbKodsLärlingen",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.18.2",
+    "nodemon": "^3.0.1"
+  }
+}
