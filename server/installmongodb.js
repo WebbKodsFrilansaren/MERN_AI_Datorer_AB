@@ -5,7 +5,7 @@ const bcrypt = require("bcrypt");
 // Async function to run
 async function installMongoDB() {
   // Names of connection URL, Database and Collection
-  const url = "mongodb://localhost:27017";
+  const url = "mongodb://sysadmin:superAdmin1337@localhost:27017";
   const dbName = "maka2207";
   const dbCollection = "pccomponents";
 
@@ -422,17 +422,11 @@ async function installMongoDB() {
     // Then insert all object data into that collection!
     await collection.insertMany(pccomponentsData);
 
-    // Access
-    const adminDb = client.db("admin");
-
-    await adminDb.createUser({
-      user: "sysadmin",
-      pwd: hashedPwAdmin,
-      roles: [
-        "userAdminAnyDatabase",
-        "dbAdminAnyDatabase",
-        "readWriteAnyDatabase",
-      ],
+    // Then create a user called "testuser1"
+    await db.command({
+      createUser: "testuser1",
+      pwd: "testuser1",
+      roles: [{ role: "readWrite", db: "maka2207" }],
     });
 
     // DONE!

@@ -7,6 +7,10 @@
 
 0. Konfigurera så att MongoDB är redo att köras lokalt (på mongodb://localhost:27017).
 
+   - Skriv i kompatibel Terminal som stödjer MongoShell: `mongosh` och sedan: `use admin`.
+   - Skriv sen: `db.createUser({user: "sysadmin",pwd: "superAdmin1337",roles: ["userAdminAnyDatabase","dbAdminAnyDatabase","readWriteAnyDatabase",]})`.
+   - Konfigurera sen i `mongod.cfg`-filen så att `security: authorization: enabled` gäller under "#security".
+
 1. Öppna VSCode och välj mapp, öppna sedan Terminal och skriv:`git clone https://github.com/WebbkodsLarlingen/dt162g-projekt-maka2207.git`.
 
 2. Skriv sedan i samma Terminal:`npm run installall` i mappen där repo klonades (både server & frontend installeras nu).
