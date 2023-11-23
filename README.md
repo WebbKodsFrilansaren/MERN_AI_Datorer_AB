@@ -17,6 +17,10 @@
 
 5. Besök nu http://localhost:3000/ för fullständig MERN-upplevelse!
 
+6. Skriv i Terminal i klonade huvudmappen:`npm run installimages` för att återställa/kopiera nya bilder från backup-mappen (sker på serversidan). Dessa hamnar då i `/server/images/components`.
+
+7. Skriv i Terminal i klonade huvudmappen:`npm run installmongodb` för att återställa/skapa testdata i MongoDB-databasen (sker på serversidan). Databasen heter då:`maka2207` och dess kollektion:`pccomponents`.
+
 ## ENDPOINTS
 
 Alla REST API endpoints följer formatet `localhost:5000/api/{CRUD endpoint}`.

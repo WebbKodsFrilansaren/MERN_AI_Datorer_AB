@@ -4,6 +4,8 @@
   "description": "Projektuppgiften i HT2023 DT162G Datateknik GR (B), Javascriptbaserad webbutveckling av maka2207",
   "main": "index.js",
   "scripts": {
+    "installimages": "node server/installimages.js",
+    "installmongodb": "node server/installmongodb.js",
     "installclient": "npm install --prefix client",
     "installserver": "npm install",
     "installall": "npm run installserver && npm run installclient",
