@@ -1,34 +1,24 @@
 // Import and initialize Express listening on configured or port 5000
+require("dotenv").config({ path: "../.env" }); // Load .env variables
 const express = require("express");
 const app = express();
-const port = 5000;
-// Also import router file
-const apiRouter = require("./routes/api");
-// Use the "public" folder for web browser pages
-app.use(express.static("public"));
+const port = process.env.SERVER_PORT;
+
+const { decrypt, encrypt } = require("./helpers/de_encrypt.js");
+const test = encrypt("testar");
+
+console.log(decrypt(test[0], test[1]));
+
+//console.log(decrypt("9ea3a1f54128b8a1f4ff2bb698c4ab7a"));
 
 // Use JSON Parser in Express so we can grab `req.body` JSON data
 app.use(express.json());
 
-// MongoDB client is being used by the API router so no need here.
-// Redirect all incoming /api/ CRUD requsts to the API router
-app.use("/api", apiRouter);
+//
 
 // FINALLY BEFORE STARTING SERVER: Catch all invalid CRUDs!
 // A "catch-all" during invalid REST API requests being made.
-app.get("/*", (req, res) => {
-  return res.status(400).json({ error: `Ogiltigt REST API-anrop!` });
-});
-app.post("/*", (req, res) => {
-  return res.status(400).json({ error: `Ogiltigt REST API-anrop!` });
-});
-app.put("/*", (req, res) => {
-  return res.status(400).json({ error: `Ogiltigt REST API-anrop!` });
-});
-app.patch("/*", (req, res) => {
-  return res.status(400).json({ error: `Ogiltigt REST API-anrop!` });
-});
-app.delete("/*", (req, res) => {
+app.all("*", (req, res) => {
   return res.status(400).json({ error: `Ogiltigt REST API-anrop!` });
 });
 

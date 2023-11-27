@@ -2,14 +2,13 @@
 
 ## KOM IGÅNG LOKALT
 
-- SERVER KÖRS PÅ: localhost:5000
-- KLIENT KÖRS PÅ: localhost:3000
+- REST API-SERVER KÖRS PÅ: localhost:3000
+- BFF-SERVER KÖRS PÅ: localhost:3001
+- KLIENT KÖRS PÅ: localhost:5000
 
 0. Konfigurera så att MongoDB är redo att köras lokalt (på mongodb://localhost:27017).
 
-   - Skriv i kompatibel Terminal som stödjer MongoShell: `mongosh` och sedan: `use admin`.
-   - Skriv sen: `db.createUser({user: "sysadmin",pwd: "superAdmin1337",roles: ["userAdminAnyDatabase","dbAdminAnyDatabase","readWriteAnyDatabase",]})`.
-   - Konfigurera sen i `mongod.cfg`-filen så att `security: authorization: enabled` gäller under "#security".
+   - Döp om `.envTEMPLATE` till `.env` för att konfigurera parametrar där (t.ex. lösenord för testkonton och olika slags JWTs). Parametrar för MongoDB databas och dess kollektioner är redan färdigkonfigurerade.
 
 1. Öppna VSCode och välj mapp, öppna sedan Terminal och skriv:`git clone https://github.com/WebbkodsLarlingen/dt162g-projekt-maka2207.git`.
 
@@ -24,6 +23,8 @@
 6. Skriv i Terminal i klonade huvudmappen:`npm run installimages` för att återställa/kopiera nya bilder från backup-mappen (sker på serversidan). Dessa hamnar då i `/server/images/components`.
 
 7. Skriv i Terminal i klonade huvudmappen:`npm run installmongodb` för att återställa/skapa testdata i MongoDB-databasen (sker på serversidan). Databasen heter då:`maka2207` och dess kollektion:`pccomponents`.
+
+8. Skriv i valfri Terminal där ingen server körs `npm run generatetokens` för att generera en "access token" och en "refresh token" som bör klistras in i `.env`-filen (den som döpts om från `.envTEMPLATE`-filen).
 
 ## ENDPOINTS
 

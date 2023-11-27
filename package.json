@@ -4,8 +4,9 @@
   "description": "Projektuppgiften i HT2023 DT162G Datateknik GR (B), Javascriptbaserad webbutveckling av maka2207",
   "main": "index.js",
   "scripts": {
-    "installimages": "node server/installimages.js",
-    "installmongodb": "node server/installmongodb.js",
+    "installimages": "node server/scripts/installimages.js",
+    "installmongodb": "node server/scripts/installmongodb.js",
+    "generatetokens": "node server/scripts/generatetokens.js",
     "installclient": "npm install --prefix client",
     "installserver": "npm install",
     "installall": "npm run installserver && npm run installclient",
@@ -16,6 +17,8 @@
   "license": "ISC",
   "dependencies": {
     "bcrypt": "^5.1.1",
+    "cookie-parser": "^1.4.6",
+    "dotenv": "^16.3.1",
     "express": "^4.18.2",
     "jsonwebtoken": "^9.0.2",
     "mongodb": "^6.3.0",

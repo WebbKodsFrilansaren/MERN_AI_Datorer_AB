@@ -1,10 +1,12 @@
+require("dotenv").config();
 // This imports Express and uses the in-built router object in Express
 const express = require("express");
 const router = express.Router();
 
 // Now we need MongoClient from mongodb npm package and...
 const { MongoClient } = require("mongodb");
-const dbURL = "mongodb://localhost:27017"; // ... its connection...
+const dbURL = process.env.MONGO_URL;
+//"mongodb://localhost:27017"; // ... its connection...
 
 // For File Management being done in NodeJS (for handling images)
 const fs = require("fs");
