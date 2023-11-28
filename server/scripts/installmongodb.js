@@ -1,3 +1,4 @@
+require("dotenv").config();
 // Store MongoDB module & hasing password module (bcrypt)
 const { MongoClient } = require("mongodb");
 const bcrypt = require("bcrypt");
@@ -9,10 +10,14 @@ installMongoDB();
 async function installMongoDB() {
   // Names of connection URL, Database and Collection
   const url = "mongodb://localhost:27017"; // Localhost MongoDB Connection URL
-  const dbName = "maka2207"; // Name of entire Database
-  const dbCollection = "pccomponents"; // For CRUD of inventory of PC components
-  const dbCollection2 = "users"; // Users when Register and Login
-  const dbCollection3 = "blacklist"; // Banned IP addresses as safety measure
+  const dbName = process.env.MONGO_DB; // Name of entire Database
+  const dbCol1 = process.env.MONGO_DB_COL_PCCOMPONENTS; // For CRUD of inventory of PC components
+  const dbCol2 = process.env.MONGO_DB_COL_USERS; // Users when Register and Login
+  const dbCol3 = process.env.MONGO_DB_COL_BLACKLIST; // Banned IP addresses as safety measure
+
+  // Bcrypt-hashed password for testuser1 & admin using 10 rounds of salting
+  const hashedPwTestUser = await bcrypt.hash("testUSER1", 10);
+  const hashedPwAdmin = await bcrypt.hash("superAdmin1337", 10);
 
   // Data to insertMany() with
   // PC Components and links to their images on the server-side
@@ -413,6 +418,8 @@ async function installMongoDB() {
       username: "testuser1",
       userpassword: hashedPwTestUser,
       roles: ["get_images", "get_components"],
+      access_token: "",
+      resfresh_token: "",
     },
     {
       userid: 2,
@@ -433,12 +440,10 @@ async function installMongoDB() {
         "delete_users",
         "post_users",
       ],
+      access_token: "",
+      resfresh_token: "",
     },
   ];
-
-  // Bcrypt-hashed password for testuser1 & admin using 10 rounds of salting
-  const hashedPwTestUser = await bcrypt.hash("testUSER1", 10);
-  const hashedPwAdmin = await bcrypt.hash("superAdmin1337", 10);
 
   // Create new MongoDB client object...
   const client = new MongoClient(url);
@@ -450,8 +455,8 @@ async function installMongoDB() {
 
     // Then select correct database & collection (they'll be created if they don't exist yet!)
     const db = client.db(dbName);
-    const collection = db.collection(dbCollection);
-    const usersCol = db.collection(dbCollection2);
+    const collection = db.collection(dbCol1);
+    const usersCol = db.collection(dbCol2);
 
     // Then delete all previous document objects inside of that collection after it has been created
     await collection.deleteMany({}); // {} will match all Document Objects so effectively deleting all of them!
@@ -464,10 +469,10 @@ async function installMongoDB() {
     await usersCol.insertMany(users);
 
     // DONE!
-    console.log("SUCCESS: All test data installed for use!");
+    console.log("[\x1b[32mSUCCESS\x1b[0m]: All test data installed for use!");
   } catch (err) {
     // Catch & show any error(s)!
-    console.error("DISAPPOINTED: ", err);
+    console.error("[\x1b[31mDISAPPOINTED\x1b[0m]: ", err);
   } finally {
     // Close DB connection no matter what happened!
     await client.close();

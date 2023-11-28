@@ -2,9 +2,9 @@
 
 ## KOM IGÅNG LOKALT
 
-- REST API-SERVER KÖRS PÅ: localhost:3000
-- BFF-SERVER KÖRS PÅ: localhost:3001
-- KLIENT KÖRS PÅ: localhost:5000
+- REST API-SERVER KÖRS PÅ: localhost:5000
+- BFF-SERVER KÖRS PÅ: localhost:5001
+- KLIENT KÖRS PÅ: localhost:3000
 
 0. Konfigurera så att MongoDB är redo att köras lokalt (på mongodb://localhost:27017).
 
@@ -14,7 +14,7 @@
 
 2. Skriv sedan i samma Terminal:`npm run installall` i mappen där repo klonades (både server & frontend installeras nu).
 
-3. Skriv också i samma Terminal:`npm run startserver` för att starta lokalserver (körs på localhost:5000).
+3. Skriv också i samma Terminal:`npm run startserver` för att starta lokalserver (körs på localhost:5000). Skriv sen i ny Terminal: `npm run startbff` (körs på localhost:5001).
 
 4. Öppna nu ny Terminal och skriv i den:`npm run startclient` så startas ReactJS-appen (körs på localhost:3000).
 
