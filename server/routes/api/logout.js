@@ -8,17 +8,17 @@ const { MongoClient } = require("mongodb");
 const dbURL = process.env.MONGO_URL;
 
 router.get("/", async (req, res) => {
-  return res.status(200).json({ success: "Blacklists!" });
+  return res.status(200).json({ success: "Logout!" });
 });
 
-// CATCH ALL in /api/blacklists route!
+// CATCH ALL in /api/logout route!
 router.all("*", (req, res) => {
   if (req.headers.accept.includes("html")) {
     return res.sendFile(path.join(__dirname, "../../images", "easteregg.jpg"));
   }
   return res
     .status(400)
-    .json({ error: `Ogiltigt REST API-anrop! <blacklists.js>` });
+    .json({ error: `Ogiltigt REST API-anrop! <logout.js>` });
 });
 
 // Export for use!

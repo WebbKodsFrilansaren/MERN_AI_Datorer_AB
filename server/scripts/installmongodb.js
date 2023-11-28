@@ -1,6 +1,6 @@
 require("dotenv").config();
 // Store MongoDB module & hasing password module (bcrypt)
-const { MongoClient } = require("mongodb");
+const { MongoClient, UUID } = require("mongodb");
 const bcrypt = require("bcrypt");
 
 // Run the async function
@@ -419,16 +419,16 @@ async function installMongoDB() {
   // Users "testuser1" (normal access) and "sysadmin" (access to everything)
   const users = [
     {
-      userid: 1,
+      userid: new UUID(),
       userip: "127.0.0.1",
       username: "testuser1",
       userpassword: hashedPwTestUser,
       roles: ["get_images", "get_components"],
       access_token: "",
-      resfresh_token: "",
+      refresh_token: "",
     },
     {
-      userid: 2,
+      userid: new UUID(),
       userip: "127.0.0.1",
       username: "sysadmin",
       userpassword: hashedPwAdmin,
@@ -447,7 +447,7 @@ async function installMongoDB() {
         "post_users",
       ],
       access_token: "",
-      resfresh_token: "",
+      refresh_token: "",
     },
   ];
 
