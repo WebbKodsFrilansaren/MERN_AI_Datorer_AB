@@ -8,7 +8,7 @@
 
 0. Konfigurera så att MongoDB är redo att köras lokalt (på mongodb://localhost:27017).
 
-   - Döp om `.envTEMPLATE` till `.env` för att konfigurera parametrar där (t.ex. lösenord för testkonton och olika slags JWTs). Parametrar för MongoDB databas och dess kollektioner är redan färdigkonfigurerade.
+   - Döp om `.envTEMPLATE` till `.env` för att konfigurera parametrar där (t.ex. lösenord för testkonton och olika slags JWTs). Parametrar för MongoDB databas och dess kollektioner är redan färdigkonfigurerade. _VIKTIGT:_ Kör `npm install dotenv -g` så att dotenv-paketet installeras globalt. Annars kanske det "krånglar" med att hitta .env-variablerna.
 
 1. Öppna VSCode och välj mapp, öppna sedan Terminal och skriv:`git clone https://github.com/WebbkodsLarlingen/dt162g-projekt-maka2207.git`.
 
