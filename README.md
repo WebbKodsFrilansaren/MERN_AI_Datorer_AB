@@ -14,17 +14,17 @@
 
 2. Skriv sedan i samma Terminal:`npm run installall` i mappen där repo klonades (både server & frontend installeras nu).
 
-3. Skriv också i samma Terminal:`npm run startserver` för att starta lokalserver (körs på localhost:5000). Skriv sen i ny Terminal: `npm run startbff` (körs på localhost:5001).
+3. Skriv sen i samma Terminal `npm run generatetokens` för att generera en "access token" och en "refresh token" som bör klistras in i `.env`-filen (den som döpts om från `.envTEMPLATE`-filen). _VIKTIGT:_ Dessa MÅSTE klistras in annars kan det "krångla".
 
-4. Öppna nu ny Terminal och skriv i den:`npm run startclient` så startas ReactJS-appen (körs på localhost:3000).
+4. Skriv i Terminal i klonade huvudmappen:`npm run installimages` för att återställa/kopiera nya bilder från backup-mappen (sker på serversidan). Dessa hamnar då i `/server/images/components`.
 
-5. Besök nu http://localhost:3000/ för fullständig MERN-upplevelse!
+5. Skriv i Terminal i klonade huvudmappen:`npm run installmongodb` för att återställa/skapa testdata i MongoDB-databasen (sker på serversidan). Databasen heter då:`maka2207` och dess kollektion:`pccomponents`.
 
-6. Skriv i Terminal i klonade huvudmappen:`npm run installimages` för att återställa/kopiera nya bilder från backup-mappen (sker på serversidan). Dessa hamnar då i `/server/images/components`.
+6. Skriv också i samma Terminal:`npm run startserver` för att starta lokalserver (körs på localhost:5000). Skriv sen i ny Terminal: `npm run startbff` (körs på localhost:5001).
 
-7. Skriv i Terminal i klonade huvudmappen:`npm run installmongodb` för att återställa/skapa testdata i MongoDB-databasen (sker på serversidan). Databasen heter då:`maka2207` och dess kollektion:`pccomponents`.
+7. Öppna nu ny Terminal och skriv i den:`npm run startclient` så startas ReactJS-appen (körs på localhost:3000).
 
-8. Skriv i valfri Terminal där ingen server körs `npm run generatetokens` för att generera en "access token" och en "refresh token" som bör klistras in i `.env`-filen (den som döpts om från `.envTEMPLATE`-filen).
+8. Besök nu http://localhost:3000/ för fullständig MERN-upplevelse!
 
 ## ENDPOINTS
 
