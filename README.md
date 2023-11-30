@@ -21,7 +21,7 @@
 
 7. Skriv också i samma Terminal:`npm run startserver` för att starta lokalserver (körs på localhost:5000).
 
-8. Öppna nu ny Terminal och skriv i den:`npm run startclient` så startas ReactJS-appen (körs på localhost:3000).
+8. Öppna nu ny Terminal (kontrollera ) och skriv i den:`npm run startclient` så startas ReactJS-appen (körs på localhost:3000).
 
 9. Besök nu http://localhost:3000/ för fullständig MERN-upplevelse!
 
