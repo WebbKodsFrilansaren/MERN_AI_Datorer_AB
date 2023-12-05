@@ -8,10 +8,6 @@ const crypto = require("crypto");
 const { MongoClient } = require("mongodb");
 const dbURL = process.env.MONGO_URL;
 // ...Helpers to decrypt & encrypt JWTs
-const { decrypt, encrypt } = require("../helpers/de_encrypt.js");
-
-
-
 //router.use(validateJWT);
 
 // Different /api/{sub-routes} | NO SECURITY DEMANDED: No JWT needed!
