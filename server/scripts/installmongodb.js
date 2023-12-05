@@ -16,12 +16,17 @@ async function installMongoDB() {
   const dbCol3 = process.env.MONGO_DB_COL_BLACKLIST; // Banned IP addresses as safety measure
 
   // Bcrypt-hashed password for testuser1 & admin using 10 rounds of salting
-  const hashedPwTestUser = bcrypt.hash(
+  // Need to use await or it will not have time to hash it before trying to insert it!
+  const hashedPwTestUser = await bcrypt.hash(
     process.env.MONGO_TESTDATA_TESTUSERPW,
     10
   );
-  const hashedPwAdmin = bcrypt.hash(process.env.MONGO_TESTDATA_ADMINPW, 10);
-
+  console.log(hashedPwTestUser);
+  const hashedPwAdmin = await bcrypt.hash(
+    process.env.MONGO_TESTDATA_ADMINPW,
+    10
+  );
+  console.log(hashedPwTestUser);
   // Data to insertMany() with
   // PC Components and links to their images on the server-side
   const pccomponentsData = [

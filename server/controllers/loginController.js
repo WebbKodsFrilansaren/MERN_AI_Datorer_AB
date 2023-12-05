@@ -4,11 +4,11 @@ const { MongoClient } = require("mongodb");
 const dbURL = process.env.MONGO_URL;
 const bcrypt = require("bcrypt"); // ...bcrypt to check stored password
 const jwt = require("jsonwebtoken"); // ...and JSON Web Token to sign a newly created JWT!
-const { encrypt, decrypt } = require("../helpers/de_encrypt"); // ...and encrypt helper function!
 
 // Async loginController function that is used by "POST api/login"
 const loginController = async (req, res) => {
   // First check if username & password are provided
+  console.log(req);
   if (!req.body.username || !req.body.password) {
     return res
       .status(400)
@@ -79,7 +79,10 @@ const loginController = async (req, res) => {
         if (updateLoggedInUser.modifiedCount > 0) {
           // So, let's now FINALLY send it back to the user
           client.close();
-          return res.status(200).json({ success: "Lösenord korrekt!" });
+
+          // Create a httpOnly secure cookie to also send.
+          res.cookie("access_token", token, { httpOnly: true });
+          return res.status(200).json({ success: "Inloggad. Välkommen in!" });
         }
         client.close();
         return res
