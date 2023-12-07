@@ -421,16 +421,16 @@ async function installMongoDB() {
   // Users "testuser1" (normal access) and "sysadmin" (access to everything)
   const users = [
     {
-      userid: new UUID(),
       userip: "127.0.0.1",
       username: "testuser1",
       userpassword: hashedPwTestUser,
       roles: ["get_images", "get_components"],
       access_token: "",
       refresh_token: "",
+      account_activated: true,
+      last_login: "",
     },
     {
-      userid: new UUID(),
       userip: "127.0.0.1",
       username: "sysadmin",
       userpassword: hashedPwAdmin,
@@ -450,6 +450,8 @@ async function installMongoDB() {
       ],
       access_token: "",
       refresh_token: "",
+      account_activated: true,
+      last_login: "",
     },
   ];
 

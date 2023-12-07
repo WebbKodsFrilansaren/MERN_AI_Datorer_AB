@@ -6,12 +6,11 @@ const bcrypt = require("bcrypt"); // ...bcrypt to check stored password
 const jwt = require("jsonwebtoken"); // ...and JSON Web Token to sign a newly created JWT!
 
 // Async loginController function that is used by "POST api/login"
-const loginController = async (req, res) => {
+const loginPOST = async (req, res) => {
   // First check if username & password are provided
-  console.log(req);
   if (!req.body.username || !req.body.password) {
     return res
-      .status(400)
+      .status(403)
       .json({ error: "Användarnamn och/eller lösenord saknas!" });
   }
   // Then store username+password to compare against
@@ -35,7 +34,7 @@ const loginController = async (req, res) => {
     // If we don't find it, we assume wrong username or password and stop request right here
     if (!correctUser) {
       return res
-        .status(401)
+        .status(403)
         .json({ error: "Användarnamn och/eller lösenord är fel!" });
     }
 
@@ -45,54 +44,65 @@ const loginController = async (req, res) => {
       // Internal error but we still say it is not because of it for security reasons
       if (err) {
         client.close();
-        return res.status(401).json({
+        return res.status(403).json({
           error: "Användarnamn och/eller lösenord är fel!",
         });
       }
       // Correct password after check!
       if (result) {
         // Now create JWT Token and sign it using ACCESS_TOKEN
-        const token = jwt.sign(
-          { username: correctUser.username, roles: correctUser.roles },
+        const accessToken = jwt.sign(
+          { iss: "AI Datorer AB", username: correctUser.username, roles: correctUser.roles },
           process.env.ACCESS_TOKEN,
           {
-            expiresIn: "30s",
+            expiresIn: "10s",
           }
         );
-        console.log("JWT(non-crypted):", token);
+        const refreshToken = jwt.sign(
+          { username: correctUser.username, roles: correctUser.roles },
+          process.env.REFRESH_TOKEN,
+          {
+            expiresIn: "1d",
+          }
+        );
+        console.log("ACCESS TOKEN & REFRESH TOKEN ISSUED!");
         // Encrypt the JWT which will also have a Buffer<> that will be stored in MongoDB!
 
-        // Now update in the collection "users" where `username: req.body.username (which we NOW know is correct)`
-        // where we insert the "encryptedToken" which is an array with encrypted part and its Buffer-based "iv".
+        // Insert new access & refresh token for successfully logged in user!
         const updateLoggedInUser = await dbColUsers.updateOne(
           {
             username: correctUser.username,
           },
           {
             $set: {
-              access_token: token,
+              access_token: accessToken,
+              refresh_token: refreshToken,
             },
           }
-        ); // We
+        );
 
         // If modifiedCount > 0 then we successfully stored the encrypted access token!
         if (updateLoggedInUser.modifiedCount > 0) {
           // So, let's now FINALLY send it back to the user
           client.close();
 
-          // Create a httpOnly secure cookie to also send.
-          res.cookie("access_token", token, { httpOnly: true });
-          return res.status(200).json({ success: "Inloggad. Välkommen in!" });
+          // Send refresh token in httpOnly cookie
+          // and send short-lived access tooken in JSON that will be stored in JS memory for client!
+          res.cookie("refresh_token", refreshToken, { httpOnly: true });
+          return res.status(200).json({
+            success: "Inloggad. Välkommen in!",
+            accessToken: accessToken,
+          });
         }
         client.close();
         return res
-          .status(401)
+          .status(403)
           .json({ error: "Något gick fel vid inloggning. Prova igen!" });
       } // Wrong password after check!
       else {
         client.close();
         return res
-          .status(401)
+          .status(403)
           .json({ error: "Användarnamn och/eller lösenord är fel!" });
       }
     });
@@ -102,12 +112,7 @@ const loginController = async (req, res) => {
     return res.status(500).json({
       message: "Fel inträffat på serversidan!",
     });
-  } finally {
-    // Always do no matter what try-catch result!
-    // Close MongoDB connection
-    //client.close();
   }
 };
-
 // Export Controller for use!
-module.exports = loginController;
+module.exports = loginPOST;

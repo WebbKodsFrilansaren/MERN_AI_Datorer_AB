@@ -4,6 +4,7 @@ const express = require("express");
 const cors = require("cors");
 const app = express();
 const path = require("path");
+const cookieParser = require("cookie-parser");
 const port = process.env.SERVER_PORT;
 const { corsOptions } = require("../config/corsOPTIONS.js"); // CORS Options are stored here!
 
@@ -13,6 +14,9 @@ app.use(express.urlencoded({ extended: false })); // Grab req.body Form Data
 
 // Apply CORS using "corsOptions" which only allow HTTP requests from origin:localhost:3000 (ReactJS SPA)
 app.use(cors(corsOptions));
+
+// Initialize cookieParser!
+app.use(cookieParser());
 
 // Use the "root.js" main router file to send all HTTP requests beginning with "/api/" there
 app.use("/api", require("./routes/root.js"));

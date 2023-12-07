@@ -3,9 +3,10 @@ require("dotenv").config();
 const express = require("express");
 const router = express.Router();
 const path = require("path");
+const login = require("../../controllers/loginController.js");
 
 // Endpoint: POST /api/login
-router.post("/", require("../../controllers/loginController.js"));
+router.post("/", login);
 
 // CATCH ALL in /api/login route!
 router.all("*", (req, res) => {

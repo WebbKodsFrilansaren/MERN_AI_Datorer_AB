@@ -3,22 +3,18 @@ require("dotenv").config();
 const express = require("express");
 const router = express.Router();
 const path = require("path");
-const crypto = require("crypto");
-// Now we need MongoClient from mongodb npm package and...
-const { MongoClient } = require("mongodb");
-const dbURL = process.env.MONGO_URL;
-// ...Helpers to decrypt & encrypt JWTs
-//router.use(validateJWT);
 
 // Different /api/{sub-routes} | NO SECURITY DEMANDED: No JWT needed!
-router.use("/login", require("./api/login.js"));
-router.use("/register", require("./api/register.js"));
-router.use("/logout", require("./api/logout.js"));
+router.use("/login", require("./api/loginRouter.js"));
+router.use("/register", require("./api/registerRouter.js"));
+router.use("/logout", require("./api/logoutRouter.js"));
 
 // Different /api/{sub-routes} | SECURITY DEMANDED: MUST CHECK JWT FIRST!
-router.use("/blacklists", require("./api/blacklists.js"));
-router.use("/pccomponents", require("./api/pccomponents.js"));
-router.use("/users", require("./api/users.js"));
+
+//router.use(validateJWT);
+router.use("/blacklists", require("./api/blacklistsRouter.js"));
+router.use("/pccomponents", require("./api/pccomponentsRouter.js"));
+router.use("/users", require("./api/usersRouter.js"));
 
 // This is the LAST one because if we have it before others it will be ran and stop the rest of the script!
 // This is the "catch-all" responses for CRUD when someone is requesting something that does not exist.
