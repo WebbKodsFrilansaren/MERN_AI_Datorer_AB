@@ -11,7 +11,7 @@ const jwt = require("jsonwebtoken"); // ...and JSON Web Token to sign a newly cr
 // logoutController function to logout, used by "POST api/logout"
 const logoutPOST = async (req, res) => {
   // If refresh_token cookie found
-  if (req.cookies.refresh_token) {
+  if (req.cookies.refresh_token && req.cookies.refresh_token != "") {
     // Store cookie
     const refreshToken = req.cookies.refresh_token;
     // Then JWT.verify it first
@@ -30,7 +30,13 @@ const logoutPOST = async (req, res) => {
           .db(process.env.MONGO_DB)
           .collection(process.env.MONGO_DB_COL_USERS);
 
-        // Update `user` by deleting access & refresh tokens!
+        // Try finding user first if they logged out just after sysadmin changed their username!
+        const findUser = await dbColUsers.findOne({ username: user });
+        if (!findUser) {
+          return res.status(403).json({ error: "Utloggningen misslyckades!" });
+        }
+
+        // Then Update `user` by deleting access & refresh tokens!
         const deleteTokens = await dbColUsers.updateOne(
           { username: user },
           {
@@ -40,7 +46,13 @@ const logoutPOST = async (req, res) => {
 
         // If successful modifiedCount should be 1
         if (deleteTokens.modifiedCount > 0) {
+          // Then close MongoDB, send back empty refresh_token cookie
           client.close();
+          // Cookie is not only empty but also expires immediately upon receiving it
+          res.cookie("refresh_token", "", {
+            expires: new Date(0),
+            httpOnly: true,
+          });
           return res.status(200).json({ success: "Utloggad!" });
         }
       } catch (err) {

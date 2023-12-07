@@ -52,14 +52,21 @@ const loginPOST = async (req, res) => {
       if (result) {
         // Now create JWT Token and sign it using ACCESS_TOKEN
         const accessToken = jwt.sign(
-          { iss: "AI Datorer AB", username: correctUser.username, roles: correctUser.roles },
+          {
+            iss: "AI Datorer AB",
+            username: correctUser.username,
+          },
           process.env.ACCESS_TOKEN,
           {
             expiresIn: "10s",
           }
         );
+        // Now create JWT Token and sign it using REFRESH_TOKEN
         const refreshToken = jwt.sign(
-          { username: correctUser.username, roles: correctUser.roles },
+          {
+            iss: "AI Datorer AB",
+            username: correctUser.username,
+          },
           process.env.REFRESH_TOKEN,
           {
             expiresIn: "1d",
