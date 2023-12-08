@@ -84,6 +84,7 @@ const loginPOST = async (req, res) => {
             $set: {
               access_token: accessToken,
               refresh_token: refreshToken,
+              last_login: new Date(),
             },
           }
         );
