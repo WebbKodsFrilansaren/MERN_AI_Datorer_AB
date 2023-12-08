@@ -3,15 +3,15 @@ require("dotenv").config();
 const express = require("express");
 const router = express.Router();
 const path = require("path");
+const validateJWT = require("../middlewares/validateJWT.js");
 
-// Different /api/{sub-routes} | NO SECURITY DEMANDED: No JWT needed!
+// Different /api/{sub-routes} | NO SECURITY DEMANDED: No JWT needed! (even though you cannot log out if you've never logged in!)
 router.use("/login", require("./api/loginRouter.js"));
 router.use("/register", require("./api/registerRouter.js"));
 router.use("/logout", require("./api/logoutRouter.js"));
 
-// Different /api/{sub-routes} | SECURITY DEMANDED: MUST CHECK JWT FIRST!
-
-//router.use(validateJWT);
+// Different /api/{sub-routes} | SECURITY DEMANDED: MUST CHECK JWT(Access Token) FIRST!
+router.use(validateJWT); // Middleware
 router.use("/blacklists", require("./api/blacklistsRouter.js"));
 router.use("/pccomponents", require("./api/pccomponentsRouter.js"));
 router.use("/users", require("./api/usersRouter.js"));

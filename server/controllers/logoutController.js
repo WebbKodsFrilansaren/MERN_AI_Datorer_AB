@@ -4,8 +4,7 @@ const { MongoClient } = require("mongodb");
 const dbURL = process.env.MONGO_URL;
 const refreshKey = process.env.REFRESH_TOKEN;
 
-// cookie=parse httpOnly stored cookie, jwt=JWT verifying
-const cookie = require("cookie-parser");
+// jwt=JWT verifying
 const jwt = require("jsonwebtoken"); // ...and JSON Web Token to sign a newly created JWT!
 
 // logoutController function to logout, used by "POST api/logout"
