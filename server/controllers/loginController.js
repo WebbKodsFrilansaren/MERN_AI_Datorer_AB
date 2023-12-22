@@ -1,12 +1,11 @@
 require("dotenv").config();
-// Now we need MongoClient from mongodb npm package and...
-const { MongoClient } = require("mongodb");
-const dbURL = process.env.MONGO_URL;
 const bcrypt = require("bcrypt"); // ...bcrypt to check stored password
 const jwt = require("jsonwebtoken"); // ...and JSON Web Token to sign a newly created JWT!
 
 // Async loginController function that is used by "POST api/login"
 const loginPOST = async (req, res) => {
+  console.log(req.body.username);
+  console.log(req.body);
   // First check if username & password are provided
   if (!req.body.username || !req.body.password) {
     return res
@@ -20,13 +19,10 @@ const loginPOST = async (req, res) => {
   // Then initiate MongoDB connection
   let client;
   try {
-    client = new MongoClient(dbURL);
-    await client.connect();
-
     // Then grab maka2207 database and its collection "users"
-    const dbColUsers = client
-      .db(process.env.MONGO_DB)
-      .collection(process.env.MONGO_DB_COL_USERS);
+    client = req.dbClient;
+    const dbColUsers = req.dbCol;
+    await client.connect();
 
     // Look up `username` to match it exactly | returns null if not found
     const correctUser = await dbColUsers.findOne({ username: user });

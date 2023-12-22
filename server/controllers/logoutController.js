@@ -1,7 +1,5 @@
 require("dotenv").config();
 // Now we need MongoClient from mongodb npm package and...
-const { MongoClient } = require("mongodb");
-const dbURL = process.env.MONGO_URL;
 const refreshKey = process.env.REFRESH_TOKEN;
 
 // jwt=JWT verifying
@@ -21,13 +19,10 @@ const logoutPOST = async (req, res) => {
       let client;
       // Remove both refresh_token and access_token for `user`
       try {
-        client = new MongoClient(dbURL);
-        await client.connect();
-
-        // Select `users` collection from database maka2207
-        const dbColUsers = client
-          .db(process.env.MONGO_DB)
-          .collection(process.env.MONGO_DB_COL_USERS);
+       // Then grab maka2207 database and its collection "users"
+      client = req.dbClient;
+      const dbColUsers = req.dbCol;
+      await client.connect();
 
         // Try finding user first if they logged out just after sysadmin changed their username!
         const findUser = await dbColUsers.findOne({ username: user });

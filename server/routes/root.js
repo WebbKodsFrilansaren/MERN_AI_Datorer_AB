@@ -4,11 +4,12 @@ const express = require("express");
 const router = express.Router();
 const path = require("path");
 const validateJWT = require("../middlewares/validateJWT.js");
+const mongoDB = require("../middlewares/db.js");
 
 // Different /api/{sub-routes} | NO SECURITY DEMANDED: No JWT needed! (even though you cannot log out if you've never logged in!)
-router.use("/login", require("./api/loginRouter.js"));
-router.use("/register", require("./api/registerRouter.js"));
-router.use("/logout", require("./api/logoutRouter.js"));
+router.use("/login",mongoDB("maka2207","users"), require("./api/loginRouter.js"));
+router.use("/register",mongoDB("maka2207","users"), require("./api/registerRouter.js"));
+router.use("/logout",mongoDB("maka2207","users"), require("./api/logoutRouter.js"));
 
 // Different /api/{sub-routes} | SECURITY DEMANDED: MUST CHECK JWT(Access Token) FIRST!
 router.use(validateJWT); // Middleware

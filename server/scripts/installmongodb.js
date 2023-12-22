@@ -1,6 +1,6 @@
 require("dotenv").config();
 // Store MongoDB module & hasing password module (bcrypt)
-const { MongoClient, UUID } = require("mongodb");
+const { MongoClient } = require("mongodb");
 const bcrypt = require("bcrypt");
 
 // Run the async function
