@@ -3,9 +3,7 @@ require("dotenv").config();
 const express = require("express");
 const router = express.Router();
 const path = require("path");
-// Now we need MongoClient from mongodb npm package and...
-const { MongoClient } = require("mongodb");
-const dbURL = process.env.MONGO_URL;
+const validateFormInput = require("../../middlewares/validateFormInputs.js");
 
 router.get("/", async (req, res) => {
   return res.status(200).json({ success: "PC Components!" });
