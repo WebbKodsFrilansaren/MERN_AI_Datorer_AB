@@ -187,7 +187,5 @@ const logoutPOST = async (req, res) => {
   }
 };
 
-// Export for use!
-
-// Export Controller for use!
+// Export Controllers for use!
 module.exports = { loginPOST, logoutPOST };

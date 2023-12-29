@@ -35,7 +35,8 @@ router.use(
   refreshatoken.refreshAToken
 );
 
-/*  Different /api/{sub-routes} |
+/*
+    Different /api/{sub-routes} |
     SECURITY DEMANDED: MUST CHECK JWT(Access Token) FIRST!
 */
 // Always validate correct Access Token first!
