@@ -7,9 +7,7 @@ const dbURL = process.env.MONGO_URL;
 const refreshKey = process.env.REFRESH_TOKEN;
 const tokenKey = process.env.ACCESS_TOKEN;
 
-// brcypt=check encrypted passwords, cookie=parse httpOnly cookies, jwt=JWT management
-const bcrypt = require("bcrypt");
-const cookie = require("cookie-parser");
+// jwt=JWT management
 const jwt = require("jsonwebtoken");
 
 // Validate Access Token! (used as a Middleware)
@@ -57,8 +55,5 @@ const validateAccessToken = async (req, res, next) => {
     return res.status(500).json({ error: "Åtkomst nekad!" });
   }
 };
-
-// Validate Refresh Token (before issuing a new one!)
-const validateRefreshToken = async (req, res, next) => {};
-
+// Export for use!
 module.exports = validateAccessToken;

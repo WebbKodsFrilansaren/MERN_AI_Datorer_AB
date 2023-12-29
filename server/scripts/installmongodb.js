@@ -15,14 +15,9 @@ async function installMongoDB() {
   const dbCol2 = process.env.MONGO_DB_COL_USERS; // Users when Register and Login
   const dbCol3 = process.env.MONGO_DB_COL_BLACKLIST; // Banned IP addresses as safety measure
 
-  // Bcrypt-hashed password for testuser1 & admin using 10 rounds of salting
+  // Bcrypt-hashed password for testuser1-10 & admin using 10 rounds of salting
   // Need to use await or it will not have time to hash it before trying to insert it!
-  const hashedPwTestUser = await bcrypt.hash(
-    process.env.MONGO_TESTDATA_TESTUSERPW,
-    10
-  );
-
-  // More test data!
+  const hashedPwTestUser = await bcrypt.hash("testUser1Password", 10);
   const hashedPwTestUser2 = await bcrypt.hash("testUser2Password", 10);
   const hashedPwTestUser3 = await bcrypt.hash("testUser3Password", 10);
   const hashedPwTestUser4 = await bcrypt.hash("testUser4Password", 10);
@@ -32,11 +27,7 @@ async function installMongoDB() {
   const hashedPwTestUser8 = await bcrypt.hash("testUser8Password", 10);
   const hashedPwTestUser9 = await bcrypt.hash("testUser9Password", 10);
   const hashedPwTestUser10 = await bcrypt.hash("testUser10Password", 10);
-
-  const hashedPwAdmin = await bcrypt.hash(
-    process.env.MONGO_TESTDATA_ADMINPW,
-    10
-  );
+  const hashedPwAdmin = await bcrypt.hash("superAdmin1337", 10);
 
   // Data to insertMany() with
   // PC Components and links to their images on the server-side
@@ -434,6 +425,7 @@ async function installMongoDB() {
     {
       userip: "127.0.0.1",
       username: "CoolerMan1337",
+      usernamelc: "", // username lower-cased, this will be fixed before inserting the data
       useremail: "coolerMan1@AiDatorer.se",
       userfullname: "Jörgen Jönsson",
       userpassword: hashedPwTestUser,
@@ -449,6 +441,7 @@ async function installMongoDB() {
     {
       userip: "127.0.0.1",
       username: "SheeshKEKW",
+      usernamelc: "",
       useremail: "sheeshkekw@AiDatorer.se",
       userfullname: "Annicka Johnson",
       userpassword: hashedPwTestUser2,
@@ -464,6 +457,7 @@ async function installMongoDB() {
     {
       userip: "127.0.0.1",
       username: "superdupernoob",
+      usernamelc: "",
       useremail: "superdupernoob@AiDatorer.se",
       userfullname: "Robert Rosenspira",
       userpassword: hashedPwTestUser3,
@@ -479,6 +473,7 @@ async function installMongoDB() {
     {
       userip: "127.0.0.1",
       username: "ewamarklund",
+      usernamelc: "",
       useremail: "ewa.marklund4@AiDatorer.se",
       userfullname: "Ewa Marklund",
       userpassword: hashedPwTestUser4,
@@ -494,6 +489,7 @@ async function installMongoDB() {
     {
       userip: "127.0.0.1",
       username: "davvedenbravve",
+      usernamelc: "",
       useremail: "david.leksson@AiDatorer.se",
       userfullname: "David Leksson",
       userpassword: hashedPwTestUser5,
@@ -509,6 +505,7 @@ async function installMongoDB() {
     {
       userip: "127.0.0.1",
       username: "thrillie420",
+      usernamelc: "",
       useremail: "sofie.tursson@AiDatorer.se",
       userfullname: "Sofie Tursson",
       userpassword: hashedPwTestUser6,
@@ -524,6 +521,7 @@ async function installMongoDB() {
     {
       userip: "127.0.0.1",
       username: "stortorsken",
+      usernamelc: "",
       useremail: "tommy.brunberg@AiDatorer.se",
       userfullname: "Tommy Brunberg",
       userpassword: hashedPwTestUser7,
@@ -539,6 +537,7 @@ async function installMongoDB() {
     {
       userip: "127.0.0.1",
       username: "omogen69",
+      usernamelc: "",
       useremail: "olivia.davidsson@AiDatorer.se",
       userfullname: "Olivia Davidsson",
       userpassword: hashedPwTestUser8,
@@ -554,6 +553,7 @@ async function installMongoDB() {
     {
       userip: "127.0.0.1",
       username: "lukastestarlite",
+      usernamelc: "",
       useremail: "lukas.rappsberg@AiDatorer.se",
       userfullname: "Lukas Rappsberg",
       userpassword: hashedPwTestUser9,
@@ -569,6 +569,7 @@ async function installMongoDB() {
     {
       userip: "127.0.0.1",
       username: "emmaMysLunarstorm",
+      usernamelc: "",
       useremail: "emma.takmursson10@AiDatorer.se",
       userfullname: "Emma Takmursson",
       userpassword: hashedPwTestUser10,
@@ -584,6 +585,7 @@ async function installMongoDB() {
     {
       userip: "127.0.0.1",
       username: "sysadmin",
+      usernamelc: "",
       useremail: "sysadmin@AiDatorer.se",
       userfullname: "Systemadministratören",
       userpassword: hashedPwAdmin,
@@ -609,7 +611,13 @@ async function installMongoDB() {
     },
   ];
 
-  // Create new MongoDB client object...
+  // Create a usernamelc which is an all lowercased username which will be used to compare against when new users
+  // try to create a new account. For example, "sysAdmin" cannot be registered because "sysadmin" already exists!
+  users.forEach((user) => {
+    user.usernamelc = user.username.toLocaleLowerCase();
+  });
+
+  // Create new MongoDB client object
   const client = new MongoClient(url);
 
   // Then TRY all of this:
