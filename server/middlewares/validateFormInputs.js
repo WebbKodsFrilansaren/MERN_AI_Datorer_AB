@@ -17,7 +17,7 @@ const registerNewUser = async (req, res, next) => {
       .status(422)
       .json({ error: "Användarnamnet ska vara mellan 2-20 tecken långt!" });
   }
-  const validUsername = /^[a-zA-Z0-9]+$/;
+  const validUsername = /^[a-zåäöA-ZÅÄÖ0-9]+$/;
   if (!validUsername.test(req.body.username)) {
     return res.status(422).json({
       error: "Användarnamnet får endast innehålla bokstäver och siffror!",
@@ -40,8 +40,26 @@ const registerNewUser = async (req, res, next) => {
   if (!req.body?.fullname || !req.body?.fullname === "") {
     return res.status(422).json({ error: "Ange ett fullständigt namn!" });
   }
+  if (req.body.fullname.length < 6 || req.body.fullname.length > 69) {
+    return res
+      .status(422)
+      .json({ error: "Fullständigt namn bör vara mellan 6-69 tecken långt!" });
+  }
 
-  // CHECKS For "password" & "passwordrepeat"
+  // Check against known invalid characters by checking inside of a spreaded array from the string below
+  const invalidCharacters = `<>|§1234567890+?\`½!"#¤%&/()=@£$€{}[]\\¨~/^'*;:_,.-©™®÷×¼¾¡¢¥¦ª«¬¯°±²³´¶·¸¹º»`;
+  const invalidCharactersArr = [...invalidCharacters];
+  if (invalidCharactersArr.some((char) => req.body.fullname.includes(char))) {
+    return res.status(422).json({
+      error: "Det fullständiga namnet ska endast innehålla bokstäver!",
+    });
+  }
+  if (!req.body.fullname.trim().includes(" ")) {
+    return res.status(422).json({
+      error: "Separera för- och efternamn med ett mellanslag!",
+    });
+  }
+
   if (
     !req.body?.password ||
     !req.body?.password === "" ||
@@ -49,6 +67,7 @@ const registerNewUser = async (req, res, next) => {
     !req.body?.passwordrepeat === "" ||
     req.body?.password !== req.body?.passwordrepeat
   ) {
+    // CHECKS For "password" & "passwordrepeat"
     return res
       .status(422)
       .json({ error: "Ange ett lösenord och det upprepat!" });
@@ -61,8 +80,68 @@ const registerNewUser = async (req, res, next) => {
       .json({ error: "Lösenordet ska vara mellan 16-32 tecken långt!" });
   }
 
-  return res.status(200).json({ success: "OK! (registerNewUser)" });
-  // When all valid, handle api/register/!
+  // Valid password is at least 2 numbers, at least 2 special characters,
+  // at least 2 uppercase(A-Z) letters and at least 2 lowercase(a-z) letters
+  // So, test for all these, count the matches and check for correct number of matches
+  const pw = req.body.password;
+  const digits = pw.match(/\d/g);
+  const digitsCount = digits ? digits.length : 0;
+  const lowercaseLetters = pw.match(/[a-z]/g);
+  const lowercaseCount = lowercaseLetters ? lowercaseLetters.length : 0;
+  const uppercaseLetters = pw.match(/[A-Z]/g);
+  const uppercaseCount = uppercaseLetters ? uppercaseLetters.length : 0;
+  const specialCharacters = pw.match(/[!@#$%^&*_?-]/g);
+  const specialCharCount = specialCharacters ? specialCharacters.length : 0;
+  const allowedCharacters = /^[a-zA-Z0-9!@#$%^&*_?-]+$/;
+  if (!allowedCharacters.test(pw)) {
+    return res.status(422).json({
+      error:
+        "Lösenordet får endast innehålla stora och små bokstäver(a-z och A-Z), siffror(0-9) och specialtecknen !, @, #, $, %, ^, &, *, -, _, och/eller ?",
+    });
+  }
+  if (digitsCount < 2) {
+    return res.status(422).json({
+      error: "Lösenordet ska innehålla minst två(2) siffror.",
+    });
+  }
+  if (lowercaseCount < 2) {
+    return res.status(422).json({
+      error: "Lösenordet ska innehålla minst två(2) små bokstäver(a-z).",
+    });
+  }
+  if (uppercaseCount < 2) {
+    return res.status(422).json({
+      error: "Lösenordet ska innehålla minst två(2) stora bokstäver(A-Z).",
+    });
+  }
+  if (specialCharCount < 2) {
+    return res.status(422).json({
+      error:
+        "Lösenordet ska innehålla minst två(2) specialtecken som !, @, #, $, %, ^, &, *, -, _, och/eller ?",
+    });
+  }
+
+  // CHECKS For "email"
+  if (!req.body?.email || !req.body?.email === "") {
+    return res.status(422).json({ error: "Ange en e-post!" });
+  }
+  const validEmail = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
+  if (!validEmail.test(req.body.email)) {
+    return res.status(422).json({
+      error: "Ange e-post i giltigt format!",
+    });
+  }
+  if (req.body.email.length < 7 || req.body.email.length > 100) {
+    return res.status(422).json({
+      error: "E-postadressen ska vara mellan 7-100 tecken långt!",
+    });
+  }
+  if (req.body.email.split("@")[0].length < 2) {
+    return res.status(422).json({
+      error: "Minst 2 tecken framför @ krävs!",
+    });
+  }
+  // When all valid, send it to: api/register/
   next();
 };
 
