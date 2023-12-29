@@ -8,6 +8,7 @@ const mongoDB = require("../middlewares/db.js");
 const refreshatoken = require("../controllers/refreshATokenController.js");
 const loginlogout = require("../controllers/loginAndLogoutController.js");
 const registerUser = require("../controllers/registerUserController.js");
+const validateFormInput = require("../middlewares/validateFormInputs.js");
 
 /*
    Different /api/{sub-routes} |
@@ -15,21 +16,22 @@ const registerUser = require("../controllers/registerUserController.js");
    (even though you cannot log out
     if you've never logged in!)
 */
-// Login user
-router.use("/login", mongoDB("maka2207", "users"), loginlogout.loginPOST);
+// POST /api/login = Login user
+router.post("/login", mongoDB("maka2207", "users"), loginlogout.loginPOST);
 
-// Register new user
-router.use(
+// POST /api/register = Register new user
+router.post(
   "/register",
+  validateFormInput.registerNewUser,
   mongoDB("maka2207", "users"),
   registerUser.registerUser
 );
 
-// Logout current user
-router.use("/logout", mongoDB("maka2207", "users"), loginlogout.logoutPOST);
+// POST /api/logout = Logout current user
+router.post("/logout", mongoDB("maka2207", "users"), loginlogout.logoutPOST);
 
-// /api/refreshatoken = Refresh Access Token by using the (hopefully) still valid httpOnly secured JWT cookie (refresh_token in db, jwt in cookies)
-router.use(
+// GET /api/refreshatoken = Refresh Access Token by using the (hopefully) still valid httpOnly secured JWT cookie (refresh_token in db, jwt in cookies)
+router.get(
   "/refreshatoken",
   mongoDB("maka2207", "users"),
   refreshatoken.refreshAToken
@@ -39,8 +41,16 @@ router.use(
     Different /api/{sub-routes} |
     SECURITY DEMANDED: MUST CHECK JWT(Access Token) FIRST!
 */
-// Always validate correct Access Token first!
+// Always validate correct Access Token first! If this fails, nothing else below will run!
+// IMPORTANT: This is only for REST API JSON CRUD requests and not when requesting certain webpages
 router.use(validateJWT);
+
+// TEST that "validateJWT" still works for CRUD below here!
+router.use("/test", mongoDB("maka2207", "users"), async (req, res) => {
+  return res
+    .status(200)
+    .json({ success: "JWT-Test OK! Kom förbi validateJWT med CRUD!" });
+});
 
 // Router for CRUD for pccomponents
 router.use("/pccomponents", require("./api/pccomponentsRouter.js"));

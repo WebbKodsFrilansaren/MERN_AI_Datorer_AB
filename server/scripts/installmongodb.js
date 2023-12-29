@@ -423,9 +423,8 @@ async function installMongoDB() {
   // Users "testuser1" (normal access) and "sysadmin" (access to everything)
   const users = [
     {
-      userip: "127.0.0.1",
       username: "CoolerMan1337",
-      usernamelc: "", // username lower-cased, this will be fixed before inserting the data
+      usernamelc: "",
       useremail: "coolerMan1@AiDatorer.se",
       userfullname: "Jörgen Jönsson",
       userpassword: hashedPwTestUser,
@@ -439,7 +438,6 @@ async function installMongoDB() {
       last_login: "2022-03-20",
     },
     {
-      userip: "127.0.0.1",
       username: "SheeshKEKW",
       usernamelc: "",
       useremail: "sheeshkekw@AiDatorer.se",
@@ -455,7 +453,6 @@ async function installMongoDB() {
       last_login: "2022-04-25",
     },
     {
-      userip: "127.0.0.1",
       username: "superdupernoob",
       usernamelc: "",
       useremail: "superdupernoob@AiDatorer.se",
@@ -471,7 +468,6 @@ async function installMongoDB() {
       last_login: "2022-10-23",
     },
     {
-      userip: "127.0.0.1",
       username: "ewamarklund",
       usernamelc: "",
       useremail: "ewa.marklund4@AiDatorer.se",
@@ -487,7 +483,6 @@ async function installMongoDB() {
       last_login: "2023-01-25",
     },
     {
-      userip: "127.0.0.1",
       username: "davvedenbravve",
       usernamelc: "",
       useremail: "david.leksson@AiDatorer.se",
@@ -503,7 +498,6 @@ async function installMongoDB() {
       last_login: "2023-03-17",
     },
     {
-      userip: "127.0.0.1",
       username: "thrillie420",
       usernamelc: "",
       useremail: "sofie.tursson@AiDatorer.se",
@@ -519,7 +513,6 @@ async function installMongoDB() {
       last_login: "2023-04-17",
     },
     {
-      userip: "127.0.0.1",
       username: "stortorsken",
       usernamelc: "",
       useremail: "tommy.brunberg@AiDatorer.se",
@@ -535,7 +528,6 @@ async function installMongoDB() {
       last_login: "",
     },
     {
-      userip: "127.0.0.1",
       username: "omogen69",
       usernamelc: "",
       useremail: "olivia.davidsson@AiDatorer.se",
@@ -551,7 +543,6 @@ async function installMongoDB() {
       last_login: "2023-08-10",
     },
     {
-      userip: "127.0.0.1",
       username: "lukastestarlite",
       usernamelc: "",
       useremail: "lukas.rappsberg@AiDatorer.se",
@@ -567,7 +558,6 @@ async function installMongoDB() {
       last_login: "",
     },
     {
-      userip: "127.0.0.1",
       username: "emmaMysLunarstorm",
       usernamelc: "",
       useremail: "emma.takmursson10@AiDatorer.se",
@@ -583,7 +573,6 @@ async function installMongoDB() {
       last_login: "2023-11-22",
     },
     {
-      userip: "127.0.0.1",
       username: "sysadmin",
       usernamelc: "",
       useremail: "sysadmin@AiDatorer.se",

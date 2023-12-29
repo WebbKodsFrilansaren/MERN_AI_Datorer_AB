@@ -3,8 +3,7 @@ require("dotenv").config();
 const { MongoClient } = require("mongodb");
 const dbURL = process.env.MONGO_URL;
 
-// Secret keys
-const refreshKey = process.env.REFRESH_TOKEN;
+// Secret Access Token Key
 const tokenKey = process.env.ACCESS_TOKEN;
 
 // jwt=JWT management
@@ -13,18 +12,29 @@ const jwt = require("jsonwebtoken");
 // Validate Access Token! (used as a Middleware)
 const validateAccessToken = async (req, res, next) => {
   // Check if access_token exists (stored in authorization)
-  if (!req.headers.authorization) {
+  if (!req.headers.authorization && !req.headers.Authorization) {
     return res.status(403).json({ error: "Åtkomst nekad!" });
   }
   // Check if authorization header begins with "Bearer "
-  if (!req.headers.authorization.includes("Bearer ")) {
+  if (
+    !req.headers.authorization.includes("Bearer ") &&
+    !req.headers.Authorization.includes("Bearer ")
+  ) {
     return res.status(403).json({ error: "Åtkomst nekad!" });
   }
   // Store access token and try decoding it
-  const aToken = req.headers.authorization.split("Bearer ")[1];
+  const aToken =
+    req.headers.authorization.split("Bearer ")[1] ||
+    req.headers.Authorization.split("Bearer ")[1];
   try {
     // IMPORTANT: jwt.verify will FAIL if access token has expired despite being otherwise correct!
     const decoded = jwt.verify(aToken, tokenKey);
+
+    // Also validate correct issuer
+    if (decoded.iss !== "AI Datorer AB") {
+      return res.status(403).json({ error: "Åtkomst nekad" });
+    }
+
     // If we succeed then we pass on the `req` object!
     let client;
     try {

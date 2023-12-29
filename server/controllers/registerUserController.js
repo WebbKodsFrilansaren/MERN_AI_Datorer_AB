@@ -1,5 +1,5 @@
 require("dotenv").config();
-const bcrypt = require("bcrypt"); // ...bcrypt to check stored password
+const bcrypt = require("bcrypt"); // ...bcrypt to encrypt password
 const jwt = require("jsonwebtoken"); // ...and JSON Web Token to sign a newly created JWT!
 
 // Secret keys needed when generating new user

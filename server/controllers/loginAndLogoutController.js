@@ -6,8 +6,6 @@ const refreshKey = process.env.REFRESH_TOKEN;
 
 // Async loginController function that is used by "POST api/login"
 const loginPOST = async (req, res) => {
-  console.log(req.body.username);
-  console.log(req.body);
   // First check if username & password are provided
   if (!req.body.username || !req.body.password) {
     return res
@@ -131,7 +129,6 @@ const logoutPOST = async (req, res) => {
   // If jwt cookie found
   if (req.cookies.jwt && req.cookies.jwt != "") {
     // Store cookie
-    console.log(req.cookies.jwt);
     const refreshToken = req.cookies.jwt;
     // Then JWT.verify it first
     try {
