@@ -6,11 +6,11 @@ function App() {
     <div className="App">
       <header className="App-header">
         <img src={logo} className="App-logo" alt="logo" />
-        <p>
+        <p className="font-light">
           Edit <code>src/App.js</code> and save to reload.
         </p>
         <a
-          className="text-xs"
+          className="text-xl5"
           href="https://reactjs.org"
           target="_blank"
           rel="noopener noreferrer">
