@@ -166,7 +166,7 @@ const registerNewUser = async (req, res, next) => {
 };
 
 /* CRUD that ONLY sysadmin can use! */
-// For GET /api/users
+// For GET /api/users (this gets ALL users)
 const getUser = async (req, res, next) => {};
 
 // For POST /api/users
@@ -179,7 +179,7 @@ const putUser = async (req, res, next) => {};
 const deleteUser = async (req, res, next) => {};
 
 /* CRUD that ONLY users with correct role can use! (sysadmin can always use them) */
-// For GET /api/pccomponents
+// For GET /api/pccomponents  (this gets ALL pccomponents)
 const getPccomponent = async (req, res, next) => {};
 
 // For POST /api/pccomponents

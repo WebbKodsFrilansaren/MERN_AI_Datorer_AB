@@ -1,5 +1,7 @@
 # HT2023 DT162G Datateknik GR (B), Javascriptbaserad webbutveckling, 7,5 hp (distans) - PROJEKT - WebbKodsLärlingen (maka2207)
 
+# VIKTIGT: Ja, du ska ALDRIG ladda upp .env (inuti nodejs-mappen i detta repo). Detta är bara för "angelägenhetens skull" denna gång också.
+
 ## KOM IGÅNG LOKALT
 
 - SÄKER REST API-SERVER KÖRS PÅ: localhost:5000
