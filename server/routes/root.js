@@ -45,13 +45,6 @@ router.get(
 // IMPORTANT: This is only for REST API JSON CRUD requests and not when requesting certain webpages
 router.use(validateJWT);
 
-// TEST that "validateJWT" still works for CRUD below here!
-router.use("/test", mongoDB("maka2207", "users"), async (req, res) => {
-  return res
-    .status(200)
-    .json({ success: "JWT-Test OK! Kom förbi validateJWT med CRUD!" });
-});
-
 // Router for CRUD for pccomponents
 router.use("/pccomponents", require("./api/pccomponentsRouter.js"));
 
