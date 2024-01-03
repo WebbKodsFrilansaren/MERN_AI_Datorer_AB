@@ -425,7 +425,7 @@ async function installMongoDB() {
     {
       username: "CoolerMan1337",
       usernamelc: "",
-      useremail: "coolerMan1@AiDatorer.se",
+      useremail: "CoolerMan1@aidatorer.se",
       userfullname: "Jörgen Jönsson",
       userpassword: hashedPwTestUser,
       roles: ["get_images", "get_components"],
@@ -440,7 +440,7 @@ async function installMongoDB() {
     {
       username: "SheeshKEKW",
       usernamelc: "",
-      useremail: "sheeshkekw@AiDatorer.se",
+      useremail: "sheeshkekw@aidatorer.se",
       userfullname: "Annicka Johnson",
       userpassword: hashedPwTestUser2,
       roles: ["get_images", "post_images", "get_components"],
@@ -455,7 +455,7 @@ async function installMongoDB() {
     {
       username: "superdupernoob",
       usernamelc: "",
-      useremail: "superdupernoob@AiDatorer.se",
+      useremail: "superdupernoob@aidatorer.se",
       userfullname: "Robert Rosenspira",
       userpassword: hashedPwTestUser3,
       roles: [],
@@ -470,7 +470,7 @@ async function installMongoDB() {
     {
       username: "ewamarklund",
       usernamelc: "",
-      useremail: "ewa.marklund4@AiDatorer.se",
+      useremail: "ewa.marklund4@aidatorer.se",
       userfullname: "Ewa Marklund",
       userpassword: hashedPwTestUser4,
       roles: ["get_images", "delete_images", "put_components"],
@@ -485,7 +485,7 @@ async function installMongoDB() {
     {
       username: "davvedenbravve",
       usernamelc: "",
-      useremail: "david.leksson@AiDatorer.se",
+      useremail: "david.leksson@aidatorer.se",
       userfullname: "David Leksson",
       userpassword: hashedPwTestUser5,
       roles: ["get_components", "post_components"],
@@ -500,7 +500,7 @@ async function installMongoDB() {
     {
       username: "thrillie420",
       usernamelc: "",
-      useremail: "sofie.tursson@AiDatorer.se",
+      useremail: "sofie.tursson@aidatorer.se",
       userfullname: "Sofie Tursson",
       userpassword: hashedPwTestUser6,
       roles: ["post_images", "put_components"],
@@ -515,7 +515,7 @@ async function installMongoDB() {
     {
       username: "stortorsken",
       usernamelc: "",
-      useremail: "tommy.brunberg@AiDatorer.se",
+      useremail: "tommy.brunberg@aidatorer.se",
       userfullname: "Tommy Brunberg",
       userpassword: hashedPwTestUser7,
       roles: ["put_images", "delete_components"],
@@ -530,7 +530,7 @@ async function installMongoDB() {
     {
       username: "omogen69",
       usernamelc: "",
-      useremail: "olivia.davidsson@AiDatorer.se",
+      useremail: "olivia.davidsson@aidatorer.se",
       userfullname: "Olivia Davidsson",
       userpassword: hashedPwTestUser8,
       roles: ["get_images", "delete_images", "put_components"],
@@ -545,7 +545,7 @@ async function installMongoDB() {
     {
       username: "lukastestarlite",
       usernamelc: "",
-      useremail: "lukas.rappsberg@AiDatorer.se",
+      useremail: "lukas.rappsberg@aidatorer.se",
       userfullname: "Lukas Rappsberg",
       userpassword: hashedPwTestUser9,
       roles: ["get_components", "post_components"],
@@ -560,7 +560,7 @@ async function installMongoDB() {
     {
       username: "emmaMysLunarstorm",
       usernamelc: "",
-      useremail: "emma.takmursson10@AiDatorer.se",
+      useremail: "emma.takmursson10@aidatorer.se",
       userfullname: "Emma Takmursson",
       userpassword: hashedPwTestUser10,
       roles: ["post_images", "put_components"],
@@ -575,7 +575,7 @@ async function installMongoDB() {
     {
       username: "sysadmin",
       usernamelc: "",
-      useremail: "sysadmin@AiDatorer.se",
+      useremail: "sysadmin@aidatorer.se",
       userfullname: "Systemadministratören",
       userpassword: hashedPwAdmin,
       roles: [
@@ -604,6 +604,7 @@ async function installMongoDB() {
   // try to create a new account. For example, "sysAdmin" cannot be registered because "sysadmin" already exists!
   users.forEach((user) => {
     user.usernamelc = user.username.toLocaleLowerCase();
+    user.useremail = user.useremail.toLocaleLowerCase();
   });
 
   // Create new MongoDB client object

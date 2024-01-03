@@ -7,7 +7,12 @@ const refreshKey = process.env.REFRESH_TOKEN;
 // Async loginController function that is used by "POST api/login"
 const loginPOST = async (req, res) => {
   // First check if username & password are provided
-  if (!req.body.username || !req.body.password) {
+  if (
+    !req.body?.username ||
+    !req.body?.password ||
+    typeof req.body?.username !== "string" ||
+    typeof req.body?.password !== "string"
+  ) {
     return res
       .status(403)
       .json({ error: "Användarnamn och/eller lösenord saknas!" });

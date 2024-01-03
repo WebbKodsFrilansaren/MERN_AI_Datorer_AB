@@ -12,6 +12,11 @@ const registerNewUser = async (req, res, next) => {
   if (!req.body?.username || !req.body.username === "") {
     return res.status(422).json({ error: "Ange ett användarnamn!" });
   }
+  if (typeof req.body.username !== "string") {
+    return res
+      .status(422)
+      .json({ error: "Användarnamnet ska vara en sträng!" });
+  }
   if (req.body.username.length < 2 || req.body.username.length > 20) {
     return res
       .status(422)
@@ -40,6 +45,11 @@ const registerNewUser = async (req, res, next) => {
   if (!req.body?.fullname || !req.body?.fullname === "") {
     return res.status(422).json({ error: "Ange ett fullständigt namn!" });
   }
+  if (typeof req.body.fullname !== "string") {
+    return res
+      .status(422)
+      .json({ error: "Det fullständiga namnet ska vara en sträng!" });
+  }
   if (req.body.fullname.length < 6 || req.body.fullname.length > 69) {
     return res
       .status(422)
@@ -59,7 +69,6 @@ const registerNewUser = async (req, res, next) => {
       error: "Separera för- och efternamn med ett mellanslag!",
     });
   }
-
   if (
     !req.body?.password ||
     !req.body?.password === "" ||
@@ -71,6 +80,14 @@ const registerNewUser = async (req, res, next) => {
     return res
       .status(422)
       .json({ error: "Ange ett lösenord och det upprepat!" });
+  }
+  if (
+    typeof req.body?.password !== "string" ||
+    typeof req.body?.passwordrepeat !== "string"
+  ) {
+    return res.status(422).json({
+      error: "Lösenordet och dess upprepning ska båda vara strängar!",
+    });
   }
   // Here we know both fields are exactly the same so we only need
   // to check one field knowing it still applies to both fields!
@@ -124,6 +141,9 @@ const registerNewUser = async (req, res, next) => {
   // CHECKS For "email"
   if (!req.body?.email || !req.body?.email === "") {
     return res.status(422).json({ error: "Ange en e-post!" });
+  }
+  if (typeof req.body.email !== "string") {
+    return res.status(422).json({ error: "E-posten ska vara en sträng!" });
   }
   const validEmail = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
   if (!validEmail.test(req.body.email)) {
