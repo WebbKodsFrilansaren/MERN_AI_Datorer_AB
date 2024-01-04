@@ -1,4 +1,5 @@
 require("dotenv").config();
+const bcrypt = require("bcrypt");
 
 // GET /api/users/
 const getAllUsers = async (req, res) => {
@@ -23,7 +24,10 @@ const getAllUsers = async (req, res) => {
         .json({ error: "Åtkomst nekad! (Ingen användare)" });
     }
     // Then check if they are authorized to continue the request
-    if (!findUser.roles.includes("get_users")) {
+    if (
+      !findUser.roles.includes("get_users") ||
+      findUser.username !== "sysadmin"
+    ) {
       client.close();
       return res
         .status(403)
@@ -107,7 +111,10 @@ const postSingleUser = async (req, res) => {
         .json({ error: "Åtkomst nekad! (Ingen användare)" });
     }
     // Then check if they are authorized to continue the request
-    if (!findUser.roles.includes("post_users")) {
+    if (
+      !findUser.roles.includes("post_users") ||
+      findUser.username !== "sysadmin"
+    ) {
       client.close();
       return res
         .status(403)
@@ -129,6 +136,7 @@ const postSingleUser = async (req, res) => {
 
 // PUT /api/users/:id
 const putSingleUser = async (req, res) => {
+  console.log(req.body);
   // Check for authData req object's existence first
   if (!req.authData || !req.authData?.username) {
     return res.status(403).json({ error: "Åtkomst nekad!" });
@@ -153,7 +161,10 @@ const putSingleUser = async (req, res) => {
         .json({ error: "Åtkomst nekad! (Ingen användare)" });
     }
     // Then check if they are authorized to continue the request
-    if (!findUser.roles.includes("put_users")) {
+    if (
+      !findUser.roles.includes("put_users") ||
+      findUser.username !== "sysadmin"
+    ) {
       client.close();
       return res
         .status(403)
@@ -176,7 +187,83 @@ const putSingleUser = async (req, res) => {
         .json({ error: `Denna användare kan ej uppdateras!` });
     }
 
-    return res.status(200).json({ success: "Användaren har uppdaterats!" });
+    // Check so changed email and/or username doesn't already exist!
+    const loweredUsername = req.body.username.toLowerCase();
+    const loweredEmail = req.body.email.toLowerCase();
+    const currentUsername = findUserToUpdate.username.toLowerCase();
+    const currentEmail = findUserToUpdate.useremail.toLowerCase();
+
+    // Check so username or useremail is not already taken while excluding user to update
+    // otherwise it will fail to update because it will think current user is "already taken"
+    const findExistingUserOrEmail = await dbColUsers.findOne({
+      $and: [
+        // "and" means that both "or"-arrays must be true (by one inside of each one of the "ors" is true!)
+        {
+          // First find either an already username or already email being used
+          $or: [{ usernamelc: loweredUsername }, { useremail: loweredEmail }],
+        },
+        {
+          // Then also check that document excludes current user's username & email
+          $or: [
+            { usernamelc: { $ne: currentUsername } },
+            { useremail: { $ne: currentEmail } },
+          ],
+        },
+      ], // This "and" is considered a match when both "or" find one of their respective usernames or emails
+    });
+
+    // If we do NOT return null, username or useremail already exists
+    if (findExistingUserOrEmail) {
+      client.close();
+      return res.status(400).json({
+        error: "Användarnamnet eller e-postadressen används redan!",
+      });
+    }
+
+    // Prepare roles from req.body.can_XYZ
+    const allRoles = [
+      req.body.can_get_images ? "get_images" : "",
+      req.body.can_put_images ? "put_images" : "",
+      req.body.can_post_images ? "post_images" : "",
+      req.body.can_delete_images ? "delete_images" : "",
+      req.body.can_get_components ? "get_components" : "",
+      req.body.can_put_components ? "put_components" : "",
+      req.body.can_post_components ? "post_components" : "",
+      req.body.can_delete_components ? "delete_components" : "",
+    ];
+    // Remove all empty elements("") by filtering
+    const roles = allRoles.filter((role) => role !== "");
+
+    // Create updated user object
+    const updateUser = {
+      username: req.body.username,
+      useremail: req.body.email.toLowerCase(),
+      userfullname: req.body.fullname,
+      usernamelc: req.body.username.toLowerCase(),
+      account_blocked: req.body.account_blocked ? true : false,
+      account_activated: req.body.account_activated ? true : false,
+      roles: roles,
+    };
+    // Check if password was given (you can update user without updating their password!)
+    if (req.body.password.trim() !== "") {
+      updateUser.userpassword = await bcrypt.hash(req.body.password, 10);
+    }
+
+    // If allowed to update found user, try updating user!
+    const tryUpdateUser = await dbColUsers.updateOne(
+      { userid: validID },
+      { $set: updateUser }
+    );
+
+    if (!tryUpdateUser) {
+      client.close();
+      return res
+        .status(500)
+        .json({ error: "Misslyckades att uppdatera användaren!" });
+    } else {
+      client.close();
+      return res.status(200).json({ success: "Användaren har uppdaterats!" });
+    }
   } catch (e) {
     client.close();
     return res

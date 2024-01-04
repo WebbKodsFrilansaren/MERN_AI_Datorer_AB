@@ -1,5 +1,5 @@
 require("dotenv").config();
-
+const { isNotBool } = require("../helpers/returnBoolean.js");
 /*
   MIDDLEWARE to validate Form Input data before sending it further.
   Each exported async function below is for validating data before it is
@@ -314,82 +314,52 @@ const postSingleUser = async (req, res, next) => {
   }
 
   // CHECKS For Booleans (activated, blocked, roles:can_xyz)
-  if (
-    req.body?.account_activated ||
-    typeof req.body?.account_activated !== "boolean"
-  ) {
+  if (isNotBool(req.body, "account_activated")) {
     return res.status(422).json({
       error: "Välj om konto ska vara (in)aktiverat vid skapande!",
     });
   }
-  if (
-    req.body?.account_blocked ||
-    typeof req.body?.account_blocked !== "boolean"
-  ) {
+  if (isNotBool(req.body, "account_blocked")) {
     return res.status(422).json({
       error: "Välj om konto ska vara (av)blockerat vid skapande!",
     });
   }
-  if (
-    req.body?.can_get_images ||
-    typeof req.body?.can_get_images !== "boolean"
-  ) {
+  if (isNotBool(req.body, "can_get_images")) {
     return res.status(422).json({
       error: "Välj om konto ska kunna få visa bilder!",
     });
   }
-  if (
-    req.body?.can_post_images ||
-    typeof req.body?.can_post_images !== "boolean"
-  ) {
+  if (isNotBool(req.body, "can_post_images")) {
     return res.status(422).json({
       error: "Välj om konto ska kunna få ladda upp bilder!",
     });
   }
-  if (
-    req.body?.can_put_images ||
-    typeof req.body?.can_put_images !== "boolean"
-  ) {
+  if (isNotBool(req.body, "can_put_images")) {
     return res.status(422).json({
       error: "Välj om konto ska kunna få ändra uppladdade bilder!",
     });
   }
-  if (
-    req.body?.can_delete_images ||
-    typeof req.body?.can_delete_images !== "boolean"
-  ) {
+  if (isNotBool(req.body, "can_delete_images")) {
     return res.status(422).json({
       error: "Välj om konto ska kunna få radera uppladdade bilder!",
     });
   }
-  if (
-    req.body?.can_get_components ||
-    typeof req.body?.can_get_components !== "boolean"
-  ) {
+  if (isNotBool(req.body, "can_get_components")) {
     return res.status(422).json({
       error: "Välj om konto ska kunna få visa datorkomponenter!",
     });
   }
-  if (
-    req.body?.can_post_components ||
-    typeof req.body?.can_post_components !== "boolean"
-  ) {
+  if (isNotBool(req.body, "can_post_components")) {
     return res.status(422).json({
       error: "Välj om konto ska kunna få lägga upp datorkomponenter!",
     });
   }
-  if (
-    req.body?.can_put_components ||
-    typeof req.body?.can_put_components !== "boolean"
-  ) {
+  if (isNotBool(req.body, "can_put_components")) {
     return res.status(422).json({
       error: "Välj om konto ska kunna få ändra upplagda datorkomponenter!",
     });
   }
-  if (
-    req.body?.can_delete_components ||
-    typeof req.body?.can_delete_components !== "boolean"
-  ) {
+  if (isNotBool(req.body, "can_delete_components")) {
     return res.status(422).json({
       error: "Välj om konto ska kunna få radera upplagda datorkomponenter!",
     });
@@ -413,6 +383,9 @@ const putSingleUser = async (req, res, next) => {
   // CHECKS For "username"
   if (!req.body?.username || !req.body.username === "") {
     return res.status(422).json({ error: "Ange ett användarnamn!" });
+  }
+  if (req.body?.username.toLowerCase() === "sysadmin") {
+    return res.status(401).json({ error: "Användarnamnet används redan!" });
   }
   if (typeof req.body.username !== "string") {
     return res
@@ -452,6 +425,11 @@ const putSingleUser = async (req, res, next) => {
       .status(422)
       .json({ error: "Det fullständiga namnet ska vara en sträng!" });
   }
+  if (req.body?.fullname.toLowerCase().includes("systemadministratör")) {
+    return res
+      .status(401)
+      .json({ error: "Detta fullständiga namn får ej användas!" });
+  }
   if (req.body.fullname.length < 6 || req.body.fullname.length > 69) {
     return res
       .status(422)
@@ -471,61 +449,6 @@ const putSingleUser = async (req, res, next) => {
       error: "Separera för- och efternamn med ett mellanslag!",
     });
   }
-  // CHECKS For "password" & "passwordrepeat"
-  if (!req.body?.password || !req.body?.password.trim() === "") {
-    return res.status(422).json({ error: "Ange ett lösenord!" });
-  }
-  if (typeof req.body?.password !== "string") {
-    return res.status(422).json({
-      error: "Lösenordet ska vara en sträng!",
-    });
-  }
-  if (req.body.password.length < 16 || req.body.password.length > 32) {
-    return res
-      .status(422)
-      .json({ error: "Lösenordet ska vara mellan 16-32 tecken långt!" });
-  }
-
-  // Valid password is at least 2 numbers, at least 2 special characters,
-  // at least 2 uppercase(A-Z) letters and at least 2 lowercase(a-z) letters
-  // So, test for all these, count the matches and check for correct number of matches
-  const pw = req.body.password;
-  const digits = pw.match(/\d/g);
-  const digitsCount = digits ? digits.length : 0;
-  const lowercaseLetters = pw.match(/[a-z]/g);
-  const lowercaseCount = lowercaseLetters ? lowercaseLetters.length : 0;
-  const uppercaseLetters = pw.match(/[A-Z]/g);
-  const uppercaseCount = uppercaseLetters ? uppercaseLetters.length : 0;
-  const specialCharacters = pw.match(/[!@#$%^&*_?-]/g);
-  const specialCharCount = specialCharacters ? specialCharacters.length : 0;
-  const allowedCharacters = /^[a-zA-Z0-9!@#$%^&*_?-]+$/;
-  if (!allowedCharacters.test(pw)) {
-    return res.status(422).json({
-      error:
-        "Lösenordet får endast innehålla stora och små bokstäver(a-z och A-Z), siffror(0-9) och specialtecknen !, @, #, $, %, ^, &, *, -, _, och/eller ?",
-    });
-  }
-  if (digitsCount < 2) {
-    return res.status(422).json({
-      error: "Lösenordet ska innehålla minst två(2) siffror.",
-    });
-  }
-  if (lowercaseCount < 2) {
-    return res.status(422).json({
-      error: "Lösenordet ska innehålla minst två(2) små bokstäver(a-z).",
-    });
-  }
-  if (uppercaseCount < 2) {
-    return res.status(422).json({
-      error: "Lösenordet ska innehålla minst två(2) stora bokstäver(A-Z).",
-    });
-  }
-  if (specialCharCount < 2) {
-    return res.status(422).json({
-      error:
-        "Lösenordet ska innehålla minst två(2) specialtecken som !, @, #, $, %, ^, &, *, -, _, och/eller ?",
-    });
-  }
 
   // CHECKS For "email"
   if (!req.body?.email || !req.body?.email === "") {
@@ -533,6 +456,9 @@ const putSingleUser = async (req, res, next) => {
   }
   if (typeof req.body.email !== "string") {
     return res.status(422).json({ error: "E-posten ska vara en sträng!" });
+  }
+  if (req.body?.email === "sysadmin@aidatorer.se") {
+    return res.status(401).json({ error: "E-postadressen används redan!" });
   }
   const validEmail = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
   if (!validEmail.test(req.body.email)) {
@@ -552,90 +478,118 @@ const putSingleUser = async (req, res, next) => {
   }
 
   // CHECKS For Booleans (activated, blocked, roles:can_xyz)
-  if (
-    req.body?.account_activated ||
-    typeof req.body?.account_activated !== "boolean"
-  ) {
+  if (isNotBool(req.body, "account_activated")) {
     return res.status(422).json({
       error: "Välj om konto ska vara (in)aktiverat vid skapande!",
     });
   }
-  if (
-    req.body?.account_blocked ||
-    typeof req.body?.account_blocked !== "boolean"
-  ) {
+  if (isNotBool(req.body, "account_blocked")) {
     return res.status(422).json({
       error: "Välj om konto ska vara (av)blockerat vid skapande!",
     });
   }
-  if (
-    req.body?.can_get_images ||
-    typeof req.body?.can_get_images !== "boolean"
-  ) {
+  if (isNotBool(req.body, "can_get_images")) {
     return res.status(422).json({
       error: "Välj om konto ska kunna få visa bilder!",
     });
   }
-  if (
-    req.body?.can_post_images ||
-    typeof req.body?.can_post_images !== "boolean"
-  ) {
+  if (isNotBool(req.body, "can_post_images")) {
     return res.status(422).json({
       error: "Välj om konto ska kunna få ladda upp bilder!",
     });
   }
-  if (
-    req.body?.can_put_images ||
-    typeof req.body?.can_put_images !== "boolean"
-  ) {
+  if (isNotBool(req.body, "can_put_images")) {
     return res.status(422).json({
       error: "Välj om konto ska kunna få ändra uppladdade bilder!",
     });
   }
-  if (
-    req.body?.can_delete_images ||
-    typeof req.body?.can_delete_images !== "boolean"
-  ) {
+  if (isNotBool(req.body, "can_delete_images")) {
     return res.status(422).json({
       error: "Välj om konto ska kunna få radera uppladdade bilder!",
     });
   }
-  if (
-    req.body?.can_get_components ||
-    typeof req.body?.can_get_components !== "boolean"
-  ) {
+  if (isNotBool(req.body, "can_get_components")) {
     return res.status(422).json({
       error: "Välj om konto ska kunna få visa datorkomponenter!",
     });
   }
-  if (
-    req.body?.can_post_components ||
-    typeof req.body?.can_post_components !== "boolean"
-  ) {
+  if (isNotBool(req.body, "can_post_components")) {
     return res.status(422).json({
       error: "Välj om konto ska kunna få lägga upp datorkomponenter!",
     });
   }
-  if (
-    req.body?.can_put_components ||
-    typeof req.body?.can_put_components !== "boolean"
-  ) {
+  if (isNotBool(req.body, "can_put_components")) {
     return res.status(422).json({
       error: "Välj om konto ska kunna få ändra upplagda datorkomponenter!",
     });
   }
-  if (
-    req.body?.can_delete_components ||
-    typeof req.body?.can_delete_components !== "boolean"
-  ) {
+  if (isNotBool(req.body, "can_delete_components")) {
     return res.status(422).json({
       error: "Välj om konto ska kunna få radera upplagda datorkomponenter!",
     });
   }
-  // All OK, send to "putSingleUser" const in usersController.js
-  next();
+  // CHECKS For "password" | password is OPTIONAL when updating user
+  // so if it's empty (""), then it's considered not wanted to be changed!
+  if (req.body.password.trim() !== "") {
+    // Further checks if password is NOT empty meaning it wanted to be changed for user!
+    if (typeof req.body?.password !== "string") {
+      return res.status(422).json({
+        error: "Lösenordet ska vara en sträng!",
+      });
+    }
+    if (req.body.password.length < 16 || req.body.password.length > 32) {
+      return res
+        .status(422)
+        .json({ error: "Lösenordet ska vara mellan 16-32 tecken långt!" });
+    }
 
-  next();
+    // Valid password is at least 2 numbers, at least 2 special characters,
+    // at least 2 uppercase(A-Z) letters and at least 2 lowercase(a-z) letters
+    // So, test for all these, count the matches and check for correct number of matches
+    const pw = req.body.password;
+    const digits = pw.match(/\d/g);
+    const digitsCount = digits ? digits.length : 0;
+    const lowercaseLetters = pw.match(/[a-z]/g);
+    const lowercaseCount = lowercaseLetters ? lowercaseLetters.length : 0;
+    const uppercaseLetters = pw.match(/[A-Z]/g);
+    const uppercaseCount = uppercaseLetters ? uppercaseLetters.length : 0;
+    const specialCharacters = pw.match(/[!@#$%^&*_?-]/g);
+    const specialCharCount = specialCharacters ? specialCharacters.length : 0;
+    const allowedCharacters = /^[a-zA-Z0-9!@#$%^&*_?-]+$/;
+    if (!allowedCharacters.test(pw)) {
+      return res.status(422).json({
+        error:
+          "Lösenordet får endast innehålla stora och små bokstäver(a-z och A-Z), siffror(0-9) och specialtecknen !, @, #, $, %, ^, &, *, -, _, och/eller ?",
+      });
+    }
+    if (digitsCount < 2) {
+      return res.status(422).json({
+        error: "Lösenordet ska innehålla minst två(2) siffror.",
+      });
+    }
+    if (lowercaseCount < 2) {
+      return res.status(422).json({
+        error: "Lösenordet ska innehålla minst två(2) små bokstäver(a-z).",
+      });
+    }
+    if (uppercaseCount < 2) {
+      return res.status(422).json({
+        error: "Lösenordet ska innehålla minst två(2) stora bokstäver(A-Z).",
+      });
+    }
+    if (specialCharCount < 2) {
+      return res.status(422).json({
+        error:
+          "Lösenordet ska innehålla minst två(2) specialtecken som !, @, #, $, %, ^, &, *, -, _, och/eller ?",
+      });
+    }
+    // All ok even when checking password | Pass onto const putSingleUser in usersController.js
+    next();
+  }
+  // Pass onto const putSingleUser in usersController.js WITHOUT any password (empty password)
+  else {
+    next();
+  }
 };
 
 // For DELETE /api/users/:id

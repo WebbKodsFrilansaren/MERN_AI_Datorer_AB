@@ -27,6 +27,16 @@ const registerUser = async (req, res) => {
     if (checkSameEmail) {
       return res.status(400).json({ error: "E-postadressen används redan!" });
     }
+    // Only the first one to register 'sysadmin' can have the "Systemadministratören" full name!
+    const checkSysAdmin = await dbColUsers.findOne({
+      userfullname: "Systemadministratören",
+    });
+    if (checkSysAdmin) {
+      return res
+        .status(400)
+        .json({ error: "Felaktigt format i det fullständiga namnet!" });
+    }
+
     // All OK so prepare hashed password!
     const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -36,7 +46,8 @@ const registerUser = async (req, res) => {
       username: username,
       usernamelc: usernamelc,
       useremail: useremail,
-      userfullname: fullname,
+      userfullname:
+        username === "sysadmin" ? "Systemadministratören" : fullname,
       userpassword: hashedPassword,
       roles:
         username === "sysadmin" // When "sysadmin" registers they get maximum access!
@@ -58,7 +69,7 @@ const registerUser = async (req, res) => {
       access_token: "",
       refresh_token: "",
       account_blocked: false,
-      account_activated: false,
+      account_activated: username === "sysadmin" ? true : false,
       last_login: "",
     });
     // Check if successful

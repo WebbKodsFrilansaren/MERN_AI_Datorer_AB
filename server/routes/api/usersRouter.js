@@ -7,11 +7,14 @@ const validateFormInput = require("../../middlewares/validateUsersInputs.js");
 const crudUsers = require("../../controllers/usersController.js");
 
 // All CRUD routes for /api/users
-router.route("/").get(crudUsers.getAllUsers).post(crudUsers.postSingleUser); // GET + POST
+router
+  .route("/")
+  .get(crudUsers.getAllUsers)
+  .post(validateFormInput.postSingleUser, crudUsers.postSingleUser); // GET + POST
 router // PUT/:id, DELETE/:id
   .route("/:id")
-  .put(crudUsers.putSingleUser)
-  .delete(crudUsers.deleteSingleUser);
+  .put(validateFormInput.putSingleUser, crudUsers.putSingleUser)
+  .delete(validateFormInput.deleteSingleUser, crudUsers.deleteSingleUser);
 
 // CATCH ALL in /api/users route!
 router.all("*", (req, res) => {
