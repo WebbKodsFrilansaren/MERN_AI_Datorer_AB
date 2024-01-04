@@ -159,12 +159,24 @@ const putSingleUser = async (req, res) => {
         .status(403)
         .json({ error: "Åtkomst nekad! (Rollen ej tilldelad)" });
     }
-    client.close();
-    // INSERT CRUD HERE
-    // AND change "data:" to correct!
-    return res
-      .status(200)
-      .json({ success: "Alla användare hämtade!", data: filterData });
+
+    // Try find user to update first
+    const findUserToUpdate = await dbColUsers.findOne({ userid: validID });
+    if (!findUserToUpdate) {
+      client.close();
+      return res
+        .status(404)
+        .json({ error: `Användare med id:${validID} finns ej!` });
+    }
+    // If user is 'sysadmin', then cannot update!
+    if (findUserToUpdate.username === "sysadmin") {
+      client.close();
+      return res
+        .status(404)
+        .json({ error: `Denna användare kan ej uppdateras!` });
+    }
+
+    return res.status(200).json({ success: "Användaren har uppdaterats!" });
   } catch (e) {
     client.close();
     return res
