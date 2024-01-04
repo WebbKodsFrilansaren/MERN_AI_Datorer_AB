@@ -46,10 +46,18 @@ router.get(
 router.use(validateJWT);
 
 // Router for CRUD for pccomponents
-router.use("/pccomponents", require("./api/pccomponentsRouter.js"));
+router.use(
+  "/pccomponents",
+  mongoDB("maka2207", "users", "pccomponents"),
+  require("./api/pccomponentsRouter.js")
+);
 
 // Router for CRUD for users
-router.use("/users", require("./api/usersRouter.js"));
+router.use(
+  "/users",
+  mongoDB("maka2207", "users"),
+  require("./api/usersRouter.js")
+);
 
 // This is the LAST one because if we have it before others it will be ran and stop the rest of the script!
 // This is the "catch-all" responses for CRUD when someone is requesting something that does not exist.

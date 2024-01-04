@@ -4,10 +4,15 @@ const express = require("express");
 const router = express.Router();
 const path = require("path");
 const validateFormInput = require("../../middlewares/validateFormInputs.js");
+const crudUsers = require("../../controllers/usersController.js");
 
-router.get("/", async (req, res) => {
-  return res.status(200).json({ success: "Users!" });
-});
+// All CRUD routes for /api/users
+router.route("/").get(crudUsers.getAllUsers).post(crudUsers.postSingleUser); // GET + POST
+router // GET/:id, PUT/:id, DELETE/:id
+  .route("/:id")
+  .get(crudUsers.getSingleUser)
+  .put(crudUsers.putSingleUser)
+  .delete(crudUsers.deleteSingleUser);
 
 // CATCH ALL in /api/users route!
 router.all("*", (req, res) => {

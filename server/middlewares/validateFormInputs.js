@@ -194,12 +194,12 @@ const deleteSinglePccomponent = async (req, res, next) => {};
 // Export Middlewares for use!
 module.exports = {
   registerNewUser,
-  getUser,
-  getPccomponent,
-  postPccomponent,
-  postUser,
-  putPccomponent,
-  putUser,
-  deletePccomponent,
-  deleteUser,
+  getSingleUser,
+  getSinglePccomponent,
+  postSinglePccomponent,
+  postSingleUser,
+  putSinglePccomponent,
+  putSingleUser,
+  deleteSinglePccomponent,
+  deleteSingleUser,
 };

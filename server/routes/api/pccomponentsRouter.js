@@ -4,10 +4,18 @@ const express = require("express");
 const router = express.Router();
 const path = require("path");
 const validateFormInput = require("../../middlewares/validateFormInputs.js");
+const crudPCcomponents = require("../../controllers/pccomponentsController.js");
 
-router.get("/", async (req, res) => {
-  return res.status(200).json({ success: "PC Components!" });
-});
+// All CRUD routes for /api/pccomponents
+router
+  .route("/")
+  .get(crudPCcomponents.getAllPCcomponents)
+  .post(crudPCcomponents.postSinglePCcomponent); // GET + POST
+router // GET/:id, PUT/:id, DELETE/:id
+  .route("/:id")
+  .get(crudPCcomponents.getSinglePCcomponent)
+  .put(crudPCcomponents.putSinglePCcomponent)
+  .delete(crudPCcomponents.deleteSinglePCcomponent);
 
 // CATCH ALL in /api/pccomponents route!
 router.all("*", (req, res) => {

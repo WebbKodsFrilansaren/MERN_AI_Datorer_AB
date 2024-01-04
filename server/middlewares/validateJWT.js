@@ -48,21 +48,28 @@ const validateAccessToken = async (req, res, next) => {
 
       // Find user stored in JWT Access_token and then compare if same in database for that user!
       if (!findUser) {
+        client.close();
         return res.status(403).json({ error: "Åtkomst nekad!" });
       }
       if (findUser.access_token === aToken) {
         console.log("ACCESS TOKEN FORTFARANDE GILTIG! SKICKAR VIDARE!");
+        // Store the username that can be checked against database after next()
+        req.authData = { username: decoded.username };
+        client.close();
         next();
       } else {
         console.log("ACCESS TOKEN LÖPT UT!");
+        client.close();
         return res.status(403).json({ error: "Åtkomst nekad!" });
       }
     } catch (e) {
-      return res.status(500).json({ error: "Åtkomst nekad!" });
+      client.close();
+      return res.status(500).json({ error: "[VALIDATEJWT] Åtkomst nekad!" });
     }
   } catch (e) {
     // Invalid or expired access token
-    return res.status(500).json({ error: "Åtkomst nekad!" });
+    client.close();
+    return res.status(500).json({ error: "[VALIDATEJWT] Åtkomst nekad!" });
   }
 };
 // Export for use!
