@@ -167,29 +167,29 @@ const registerNewUser = async (req, res, next) => {
 
 /* CRUD that ONLY sysadmin can use! */
 // For GET /api/users/:id
-const getUser = async (req, res, next) => {};
+const getSingleUser = async (req, res, next) => {};
 
 // For POST /api/users
-const postUser = async (req, res, next) => {};
+const postSingleUser = async (req, res, next) => {};
 
 // For PUT /api/users/:id
-const putUser = async (req, res, next) => {};
+const putSingleUser = async (req, res, next) => {};
 
 // For DELETE /api/users/:id
-const deleteUser = async (req, res, next) => {};
+const deleteSingleUser = async (req, res, next) => {};
 
 /* CRUD that ONLY users with correct role can use! (sysadmin can always use them) */
 // For GET /api/pccomponents  (this gets ALL pccomponents)
-const getPccomponent = async (req, res, next) => {};
+const getSinglePccomponent = async (req, res, next) => {};
 
 // For POST /api/pccomponents/:id
-const postPccomponent = async (req, res, next) => {};
+const postSinglePccomponent = async (req, res, next) => {};
 
 // For PUT /api/pccomponents/:id
-const putPccomponent = async (req, res, next) => {};
+const putSinglePccomponent = async (req, res, next) => {};
 
 // For DELETE /api/pccomponents/:id
-const deletePccomponent = async (req, res, next) => {};
+const deleteSinglePccomponent = async (req, res, next) => {};
 
 // Export Middlewares for use!
 module.exports = {
