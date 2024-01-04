@@ -166,35 +166,91 @@ const registerNewUser = async (req, res, next) => {
 };
 
 /* CRUD that ONLY sysadmin can use! */
-// For GET /api/users/:id
-const getSingleUser = async (req, res, next) => {};
-
 // For POST /api/users
 const postSingleUser = async (req, res, next) => {};
 
 // For PUT /api/users/:id
-const putSingleUser = async (req, res, next) => {};
+const putSingleUser = async (req, res, next) => {
+  // Check /:id param is valid integer!
+  const isInteger = /^[0-9]+$/.test(req.params?.id);
+  if (
+    !req.params?.id ||
+    typeof req.params?.id !== "string" ||
+    isNaN(req.params?.id) ||
+    !isInteger
+  ) {
+    return res.status(422).json({ error: "Ange ett heltal!" });
+  }
+  next();
+};
 
 // For DELETE /api/users/:id
-const deleteSingleUser = async (req, res, next) => {};
+const deleteSingleUser = async (req, res, next) => {
+  // Check /:id param is valid integer!
+  const isInteger = /^[0-9]+$/.test(req.params?.id);
+  if (
+    !req.params?.id ||
+    typeof req.params?.id !== "string" ||
+    isNaN(req.params?.id) ||
+    !isInteger
+  ) {
+    return res.status(422).json({ error: "Ange ett heltal!" });
+  }
+  next();
+};
 
 /* CRUD that ONLY users with correct role can use! (sysadmin can always use them) */
 // For GET /api/pccomponents  (this gets ALL pccomponents)
-const getSinglePccomponent = async (req, res, next) => {};
+const getSinglePccomponent = async (req, res, next) => {
+  // Check /:id param is valid integer!
+  const isInteger = /^[0-9]+$/.test(req.params?.id);
+  if (
+    !req.params?.id ||
+    typeof req.params?.id !== "string" ||
+    isNaN(req.params?.id) ||
+    !isInteger
+  ) {
+    return res.status(422).json({ error: "Ange ett heltal!" });
+  }
+  next();
+};
 
 // For POST /api/pccomponents/:id
 const postSinglePccomponent = async (req, res, next) => {};
 
 // For PUT /api/pccomponents/:id
-const putSinglePccomponent = async (req, res, next) => {};
+const putSinglePccomponent = async (req, res, next) => {
+  // Check /:id param is valid integer!
+  const isInteger = /^[0-9]+$/.test(req.params?.id);
+  if (
+    !req.params?.id ||
+    typeof req.params?.id !== "string" ||
+    isNaN(req.params?.id) ||
+    !isInteger
+  ) {
+    return res.status(422).json({ error: "Ange ett heltal!" });
+  }
+  next();
+};
 
 // For DELETE /api/pccomponents/:id
-const deleteSinglePccomponent = async (req, res, next) => {};
+const deleteSinglePccomponent = async (req, res, next) => {
+  // Check /:id param is valid integer!
+  const isInteger = /^[0-9]+$/.test(req.params?.id);
+  if (
+    !req.params?.id ||
+    typeof req.params?.id !== "string" ||
+    isNaN(req.params?.id) ||
+    !isInteger
+  ) {
+    return res.status(422).json({ error: "Ange ett heltal!" });
+  }
+  next();
+};
 
 // Export Middlewares for use!
 module.exports = {
   registerNewUser,
-  getSingleUser,
   getSinglePccomponent,
   postSinglePccomponent,
   postSingleUser,

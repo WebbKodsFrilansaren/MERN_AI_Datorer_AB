@@ -602,9 +602,12 @@ async function installMongoDB() {
 
   // Create a usernamelc which is an all lowercased username which will be used to compare against when new users
   // try to create a new account. For example, "sysAdmin" cannot be registered because "sysadmin" already exists!
+  let userids = 0;
   users.forEach((user) => {
+    user.userid = userids + 1;
     user.usernamelc = user.username.toLocaleLowerCase();
     user.useremail = user.useremail.toLocaleLowerCase();
+    userids++;
   });
 
   // Create new MongoDB client object

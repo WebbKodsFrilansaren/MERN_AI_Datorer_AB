@@ -3,14 +3,13 @@ require("dotenv").config();
 const express = require("express");
 const router = express.Router();
 const path = require("path");
-const validateFormInput = require("../../middlewares/validateFormInputs.js");
+const validateFormInput = require("../../middlewares/validateUsersInputs.js");
 const crudUsers = require("../../controllers/usersController.js");
 
 // All CRUD routes for /api/users
 router.route("/").get(crudUsers.getAllUsers).post(crudUsers.postSingleUser); // GET + POST
-router // GET/:id, PUT/:id, DELETE/:id
+router // PUT/:id, DELETE/:id
   .route("/:id")
-  .get(crudUsers.getSingleUser)
   .put(crudUsers.putSingleUser)
   .delete(crudUsers.deleteSingleUser);
 

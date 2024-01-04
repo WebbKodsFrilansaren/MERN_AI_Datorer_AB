@@ -3,7 +3,7 @@ require("dotenv").config();
 const express = require("express");
 const router = express.Router();
 const path = require("path");
-const validateFormInput = require("../../middlewares/validateFormInputs.js");
+const validateInputs = require("../../middlewares/validateUsersInputs.js");
 const crudPCcomponents = require("../../controllers/pccomponentsController.js");
 
 // All CRUD routes for /api/pccomponents
@@ -13,9 +13,18 @@ router
   .post(crudPCcomponents.postSinglePCcomponent); // GET + POST
 router // GET/:id, PUT/:id, DELETE/:id
   .route("/:id")
-  .get(crudPCcomponents.getSinglePCcomponent)
-  .put(crudPCcomponents.putSinglePCcomponent)
-  .delete(crudPCcomponents.deleteSinglePCcomponent);
+  .get(
+    validateInputs.getSinglePccomponent,
+    crudPCcomponents.getSinglePCcomponent
+  )
+  .put(
+    validateInputs.putSinglePccomponent,
+    crudPCcomponents.putSinglePCcomponent
+  )
+  .delete(
+    validateInputs.deleteSinglePccomponent,
+    crudPCcomponents.deleteSinglePCcomponent
+  );
 
 // CATCH ALL in /api/pccomponents route!
 router.all("*", (req, res) => {

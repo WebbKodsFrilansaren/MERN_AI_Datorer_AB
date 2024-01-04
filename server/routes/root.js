@@ -8,7 +8,7 @@ const mongoDB = require("../middlewares/db.js");
 const refreshatoken = require("../controllers/refreshATokenController.js");
 const loginlogout = require("../controllers/loginAndLogoutController.js");
 const registerUser = require("../controllers/registerUserController.js");
-const validateFormInput = require("../middlewares/validateFormInputs.js");
+const validateFormInput = require("../middlewares/validateUsersInputs.js");
 
 /*
    Different /api/{sub-routes} |
