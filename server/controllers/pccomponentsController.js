@@ -167,7 +167,7 @@ const getSinglePCcomponent = async (req, res) => {
 // POST /api/pccomponents
 const postSinglePCcomponent = async (req, res) => {
   console.log(req.files);
-  console.log(process.cwd());
+  console.log(process.cwd() + "\\server\\images");
   return res.status(200).json({ success: "POST Single PCComponent!" });
 };
 

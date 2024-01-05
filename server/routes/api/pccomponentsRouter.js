@@ -8,7 +8,8 @@ const crudPCcomponents = require("../../controllers/pccomponentsController.js");
 
 // "multer" to manage uploaded images/files!
 const multer = require("multer");
-const upload = multer({ dest: "/images" });
+const imgPath = path.join(process.cwd(), "server", "images");
+const upload = multer({ dest: imgPath });
 
 // All CRUD routes for /api/pccomponents
 router
