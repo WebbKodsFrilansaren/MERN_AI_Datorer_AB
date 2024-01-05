@@ -6,11 +6,19 @@ const path = require("path");
 const validateInputs = require("../../middlewares/validateUsersInputs.js");
 const crudPCcomponents = require("../../controllers/pccomponentsController.js");
 
+// "multer" to manage uploaded images/files!
+const multer = require("multer");
+const upload = multer({ dest: "/images" });
+
 // All CRUD routes for /api/pccomponents
 router
   .route("/")
   .get(crudPCcomponents.getAllPCcomponents)
-  .post(crudPCcomponents.postSinglePCcomponent); // GET + POST
+  .post(
+    validateInputs.postSinglePccomponent,
+    upload.array("images", 7),
+    crudPCcomponents.postSinglePCcomponent
+  ); // GET + POST
 router // GET/:id, PUT/:id, DELETE/:id
   .route("/:id")
   .get(
