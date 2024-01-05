@@ -624,7 +624,10 @@ const getSinglePccomponent = async (req, res, next) => {
 };
 
 // For POST /api/pccomponents/:id
-const postSinglePccomponent = async (req, res, next) => {};
+const postSinglePccomponent = async (req, res, next) => {
+  
+  next();
+};
 
 // For PUT /api/pccomponents/:id
 const putSinglePccomponent = async (req, res, next) => {
