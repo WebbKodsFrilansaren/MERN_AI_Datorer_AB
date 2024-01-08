@@ -166,7 +166,91 @@ const getSinglePCcomponent = async (req, res) => {
 
 // POST /api/pccomponents
 const postSinglePCcomponent = async (req, res) => {
-  console.log(req.files);
+  // Check for authData req object's existence first
+  if (!req.authData || !req.authData?.username) {
+    return res.status(403).json({ error: "Åtkomst nekad!" });
+  }
+
+  // Grab integer from `req.params`
+  const validID = parseInt(req.params.id);
+
+  // Then grab username to check against in database
+  const username = req.authData.username;
+  // Init MongoDB
+  let client;
+  try {
+    // Then grab maka2207 database and its collections:
+    client = req.dbClient;
+    const dbColUsers = req.dbCol; // "users"
+    const dbColPCComponents = req.dbCol2; // "pccomponents"
+
+    // Find correct user making the request
+    const findUser = await dbColUsers.findOne({ username: username });
+    if (!findUser) {
+      client.close();
+      return res
+        .status(403)
+        .json({ error: "Åtkomst nekad! (Ingen användare)" });
+    }
+    // Then check if they are authorized to continue the request
+    if (!findUser.roles.includes("post_components")) {
+      client.close();
+      return res
+        .status(403)
+        .json({ error: "Åtkomst nekad! (Rollen ej tilldelad)" });
+    }
+
+    // Check if user also is allowed to get images when data is returned!
+    let includeImgFiles = true;
+    if (!findUser.roles.includes("post_images")) {
+      includeImgFiles = false;
+      return res
+        .status(403)
+        .json({ error: "Åtkomst nekad! (Rollen ej tilldelad)" });
+    }
+    // Grab PCComponent and filter out based on get_images access:
+    const findSingleComponent = await dbColPCComponents.findOne({
+      componentid: validID,
+    });
+
+    // PCComponent with /:id doesn't exist
+    if (!findSingleComponent) {
+      client.close();
+      return res.status(404).json({
+        error: `Datorkomponenten med id:${validID} finns inte!`,
+      });
+    }
+
+    // When it exists, return it filtered with images or without
+    filterData = {
+      componentid: findSingleComponent.componentid,
+      componentName: findSingleComponent.componentName,
+      componentDescription: findSingleComponent.componentDescription,
+      componentPrice: findSingleComponent.componentPrice,
+      componentAmount: findSingleComponent.componentAmount,
+      componentStatus: findSingleComponent.componentStatus,
+      componentCategories: findSingleComponent.componentCategories,
+    };
+
+    // Finally return the single filtered PC Component!
+    client.close();
+    return res.status(200).json({
+      success: "Datorkomponent hämtad!",
+      data: filterData,
+    });
+  } catch (e) {
+    client.close();
+    return res
+      .status(500)
+      .json({ error: "Databasfel. Kontakta Systemadministratören!" });
+  }
+
+  if (req.files === undefined) {
+    console.log("Inga bilder uppladdade!");
+  } else {
+    console.log(req.files);
+  }
+
   console.log(process.cwd() + "\\server\\images");
   return res.status(200).json({ success: "POST Single PCComponent!" });
 };
@@ -207,11 +291,6 @@ const putSinglePCcomponent = async (req, res) => {
         .json({ error: "Åtkomst nekad! (Rollen ej tilldelad)" });
     }
 
-    // Check if user also is allowed to get images when data is returned!
-    let includeImgFiles = true;
-    if (!findUser.roles.includes("put_images")) {
-      includeImgFiles = false;
-    }
     // Grab PCComponent and filter out based on get_images access:
     const findSingleComponent = await dbColPCComponents.findOne({
       componentid: validID,
@@ -221,30 +300,36 @@ const putSinglePCcomponent = async (req, res) => {
     if (!findSingleComponent) {
       client.close();
       return res.status(404).json({
-        error: `Datorkomponenten med id:${validID} finns inte!`,
+        error: `Komponenten med id:${validID} finns inte!`,
       });
     }
 
-    // When it exists, return it filtered with images or without
-    filterData = {
-      componentid: findSingleComponent.componentid,
-      componentName: findSingleComponent.componentName,
-      componentDescription: findSingleComponent.componentDescription,
-      componentPrice: findSingleComponent.componentPrice,
-      componentAmount: findSingleComponent.componentAmount,
-      componentStatus: findSingleComponent.componentStatus,
-      componentCategories: findSingleComponent.componentCategories,
-      componentImages: includeImgFiles
-        ? findSingleComponent.componentImages
-        : "",
+    // When it exists, first prepare it
+    const updateComponent = {
+      componentName: req.body.componentname,
+      componentDescription: req.body.componentdescription,
+      componentPrice: req.body.componentprice,
+      componentAmount: req.body.componentamount,
+      componentStatus: req.body.componentstatus ? "Ny" : "Begagnad",
+      componentCategories: req.body.componentcategories,
     };
 
-    // Finally return the single filtered PC Component!
-    client.close();
-    return res.status(200).json({
-      success: "Datorkomponent hämtad!",
-      data: filterData,
-    });
+    // Then, try updating it
+    const tryUpdateComponent = await dbColPCComponents.updateOne(
+      { componentid: validID },
+      { $set: updateComponent }
+    );
+
+    // If = failed updating component | Else = succeeded updating component
+    if (!tryUpdateComponent) {
+      client.close();
+      return res
+        .status(500)
+        .json({ error: "Misslyckades att uppdatera komponenten!" });
+    } else {
+      client.close();
+      return res.status(200).json({ success: "Komponenten har uppdaterats!" });
+    }
   } catch (e) {
     client.close();
     return res

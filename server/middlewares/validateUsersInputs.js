@@ -623,9 +623,121 @@ const getSinglePccomponent = async (req, res, next) => {
   next();
 };
 
-// For POST /api/pccomponents/:id
+// For POST /api/pccomponents
 const postSinglePccomponent = async (req, res, next) => {
-  
+  // CHECKS for "componentname"
+  if (!req.body?.componentname || !req.body.componentname === "") {
+    return res.status(422).json({ error: "Ange ett namn för komponenten!" });
+  }
+  if (typeof req.body.componentname !== "string") {
+    return res
+      .status(422)
+      .json({ error: "Komponentens namn ska vara en sträng!" });
+  }
+  if (
+    req.body.componentname.length < 2 ||
+    req.body.componentname.length > 100
+  ) {
+    return res
+      .status(422)
+      .json({ error: "Komponentens namn ska vara mellan 2-100 tecken långt!" });
+  }
+
+  // CHECKS for "componentdescription"
+  if (
+    !req.body?.componentdescription ||
+    !req.body.componentdescription === ""
+  ) {
+    return res
+      .status(422)
+      .json({ error: "Ange en beskrivning för komponenten!" });
+  }
+  if (typeof req.body.componentdescription !== "string") {
+    return res
+      .status(422)
+      .json({ error: "Komponentens beskrivning ska vara en sträng!" });
+  }
+  if (
+    req.body.componentdescription.length < 25 ||
+    req.body.componentdescription.length > 1000
+  ) {
+    return res.status(422).json({
+      error: "Komponentens beskrivning ska vara mellan 25-1000 tecken långt!",
+    });
+  }
+
+  // CHECKS for "componentprice"
+  if (req.body?.componentprice <= "0" || req.body?.componentprice <= 0) {
+    return res
+      .status(422)
+      .json({ error: "Komponentens pris får inte vara 0 eller lägre!" });
+  }
+  if (!req.body?.componentprice || req.body?.componentprice === "") {
+    return res
+      .status(422)
+      .json({ error: "Ange ett pris för komponenten i heltal!" });
+  }
+  const isInteger = /^[0-9]+$/.test(req.body.componentprice);
+  if (
+    !req.body.componentprice ||
+    typeof req.body.componentprice !== "number" ||
+    isNaN(req.body.componentprice) ||
+    !isInteger
+  ) {
+    return res
+      .status(422)
+      .json({ error: "Komponentens pris ska vara ett heltal!" });
+  }
+
+  // CHECKS for "componentamount"
+  if (
+    !Object.hasOwn(req.body, "componentamount") ||
+    typeof req.body?.componentamount !== "number"
+  ) {
+    return res.status(422).json({ error: "Ange komponentens antal i heltal!" });
+  }
+  if (req.body.componentamount < "0" || req.body.componentamount < 0) {
+    return res
+      .status(422)
+      .json({ error: "Komponentens antal får inte vara lägre än 0!" });
+  }
+  const isInteger2 = /^[0-9]+$/.test(req.body.componentamount);
+  if (
+    typeof req.body.componentamount !== "number" ||
+    isNaN(req.body.componentamount) ||
+    !isInteger2
+  ) {
+    return res
+      .status(422)
+      .json({ error: "Komponentens antal ska vara ett heltal!" });
+  }
+
+  // CHECKS for "componentstatus"
+  if (
+    !Object.hasOwn(req.body, "componentstatus") ||
+    typeof req.body?.componentstatus !== "boolean"
+  ) {
+    return res
+      .status(422)
+      .json({ error: "Ange komponentens status - ny eller begagnad!" });
+  }
+  // CHECKS for "componentcategories"
+  if (!Object.hasOwn(req.body, "componentcategories")) {
+    return res
+      .status(422)
+      .json({ error: "Ange färst en kategori för komponenten!" });
+  }
+  if (
+    !Array.isArray(req.body.componentcategories) ||
+    req.body.componentcategories?.length == 0
+  ) {
+    return res
+      .status(422)
+      .json({ error: "Ange färst en kategori för komponenten!" });
+  }
+
+  // CHECKS for "componentimages"
+
   next();
 };
 
@@ -641,6 +753,119 @@ const putSinglePccomponent = async (req, res, next) => {
   ) {
     return res.status(422).json({ error: "Ange ett heltal!" });
   }
+  // CHECKS for "componentname"
+  if (!req.body?.componentname || !req.body.componentname === "") {
+    return res.status(422).json({ error: "Ange ett namn för komponenten!" });
+  }
+  if (typeof req.body.componentname !== "string") {
+    return res
+      .status(422)
+      .json({ error: "Komponentens namn ska vara en sträng!" });
+  }
+  if (
+    req.body.componentname.length < 2 ||
+    req.body.componentname.length > 100
+  ) {
+    return res
+      .status(422)
+      .json({ error: "Komponentens namn ska vara mellan 2-100 tecken långt!" });
+  }
+
+  // CHECKS for "componentdescription"
+  if (
+    !req.body?.componentdescription ||
+    !req.body.componentdescription === ""
+  ) {
+    return res
+      .status(422)
+      .json({ error: "Ange en beskrivning för komponenten!" });
+  }
+  if (typeof req.body.componentdescription !== "string") {
+    return res
+      .status(422)
+      .json({ error: "Komponentens beskrivning ska vara en sträng!" });
+  }
+  if (
+    req.body.componentdescription.length < 25 ||
+    req.body.componentdescription.length > 1000
+  ) {
+    return res.status(422).json({
+      error: "Komponentens beskrivning ska vara mellan 25-1000 tecken långt!",
+    });
+  }
+
+  // CHECKS for "componentprice"
+  if (req.body?.componentprice <= "0" || req.body?.componentprice <= 0) {
+    return res
+      .status(422)
+      .json({ error: "Komponentens pris får inte vara 0 eller lägre!" });
+  }
+  if (!req.body?.componentprice || req.body?.componentprice === "") {
+    return res
+      .status(422)
+      .json({ error: "Ange ett pris för komponenten i heltal!" });
+  }
+  const isInteger2 = /^[0-9]+$/.test(req.body.componentprice);
+  if (
+    !req.body.componentprice ||
+    typeof req.body.componentprice !== "number" ||
+    isNaN(req.body.componentprice) ||
+    !isInteger2
+  ) {
+    return res
+      .status(422)
+      .json({ error: "Komponentens pris ska vara ett heltal!" });
+  }
+
+  // CHECKS for "componentamount"
+  if (
+    !Object.hasOwn(req.body, "componentamount") ||
+    typeof req.body?.componentamount !== "number"
+  ) {
+    return res.status(422).json({ error: "Ange komponentens antal i heltal!" });
+  }
+  if (req.body.componentamount < "0" || req.body.componentamount < 0) {
+    return res
+      .status(422)
+      .json({ error: "Komponentens antal får inte vara lägre än 0!" });
+  }
+  const isInteger3 = /^[0-9]+$/.test(req.body.componentamount);
+  if (
+    typeof req.body.componentamount !== "number" ||
+    isNaN(req.body.componentamount) ||
+    !isInteger3
+  ) {
+    return res
+      .status(422)
+      .json({ error: "Komponentens antal ska vara ett heltal!" });
+  }
+
+  // CHECKS for "componentstatus"
+  if (
+    !Object.hasOwn(req.body, "componentstatus") ||
+    typeof req.body?.componentstatus !== "boolean"
+  ) {
+    return res
+      .status(422)
+      .json({ error: "Ange komponentens status - ny eller begagnad!" });
+  }
+  // CHECKS for "componentcategories"
+  if (!Object.hasOwn(req.body, "componentcategories")) {
+    return res
+      .status(422)
+      .json({ error: "Ange färst en kategori för komponenten!" });
+  }
+  if (
+    !Array.isArray(req.body.componentcategories) ||
+    req.body.componentcategories?.length == 0
+  ) {
+    return res
+      .status(422)
+      .json({ error: "Ange färst en kategori för komponenten!" });
+  }
+
+  // CHECKS for "componentimages"
+
   next();
 };
 

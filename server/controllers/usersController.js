@@ -181,17 +181,16 @@ const postSingleUser = async (req, res) => {
 
     // Try insert new user
     const insertNewUser = await dbColUsers.insertOne(postNewUser);
-    console.log(insertNewUser);
 
     // If = succeeded to insert new user | else = failed to insert new user
     if (insertNewUser) {
       client.close();
-      return res.status(200).json({ success: "Ny användare skapad!" });
+      return res.status(201).json({ success: "En ny användare har skapats!" });
     } else {
       client.close();
       return res
         .status(500)
-        .json({ error: "Misslyckades skapa ny användare!" });
+        .json({ error: "Misslyckades att skapa ny användare!" });
     }
   } catch (e) {
     client.close();
@@ -203,7 +202,6 @@ const postSingleUser = async (req, res) => {
 
 // PUT /api/users/:id
 const putSingleUser = async (req, res) => {
-  console.log(req.body);
   // Check for authData req object's existence first
   if (!req.authData || !req.authData?.username) {
     return res.status(403).json({ error: "Åtkomst nekad!" });
