@@ -98,6 +98,7 @@ const postSingleUser = async (req, res) => {
   const username = req.authData.username;
   // Init MongoDB
   let client;
+  let nextUserId = 1;
   try {
     // Then grab maka2207 database and its collection "users"
     client = req.dbClient;
@@ -120,12 +121,78 @@ const postSingleUser = async (req, res) => {
         .status(403)
         .json({ error: "Åtkomst nekad! (Rollen ej tilldelad)" });
     }
-    client.close();
-    // INSERT CRUD HERE
-    // AND change "data:" to correct!
-    return res
-      .status(200)
-      .json({ success: "Alla användare hämtade!", data: filterData });
+
+    // First find either an already username or already email being used
+    const findExistingUserOrEmail = await dbColUsers.findOne({
+      $or: [
+        { usernamelc: req.body.username.toLowerCase() },
+        { useremail: req.body.email.toLowerCase() },
+      ],
+    });
+
+    // If we do NOT return null, username or useremail already exists
+    if (findExistingUserOrEmail) {
+      client.close();
+      return res.status(400).json({
+        error: "Användarnamnet eller e-postadressen används redan!",
+      });
+    }
+
+    // Find highest current value of `userid` by sorting it from max value and just
+    const highestUserId = await dbColUsers
+      .find()
+      .sort({ userid: -1 })
+      .limit(1)
+      .next();
+
+    // If DOES exist then nextUserId is that plus one, otherwise it is the first user!
+    if (highestUserId) {
+      nextUserId = highestUserId.userid + 1;
+    }
+
+    // Prepare roles from req.body.can_XYZ
+    const allRoles = [
+      req.body.can_get_images ? "get_images" : "",
+      req.body.can_put_images ? "put_images" : "",
+      req.body.can_post_images ? "post_images" : "",
+      req.body.can_delete_images ? "delete_images" : "",
+      req.body.can_get_components ? "get_components" : "",
+      req.body.can_put_components ? "put_components" : "",
+      req.body.can_post_components ? "post_components" : "",
+      req.body.can_delete_components ? "delete_components" : "",
+    ];
+    // Remove all empty elements("") by filtering
+    const roles = allRoles.filter((role) => role !== "");
+
+    // Prepare new user to insert
+    const userpw = await bcrypt.hash(req.body.password, 10);
+    const postNewUser = {
+      username: req.body.username,
+      usernamelc: req.body.username.toLowerCase(),
+      userpassword: userpw,
+      useremail: req.body.email.toLowerCase(),
+      userfullname: req.body.fullname,
+      usernamelc: req.body.username.toLowerCase(),
+      account_blocked: req.body.account_blocked ? true : false,
+      account_activated: req.body.account_activated ? true : false,
+      roles: roles,
+      userid: nextUserId,
+    };
+
+    // Try insert new user
+    const insertNewUser = await dbColUsers.insertOne(postNewUser);
+    console.log(insertNewUser);
+
+    // If = succeeded to insert new user | else = failed to insert new user
+    if (insertNewUser) {
+      client.close();
+      return res.status(200).json({ success: "Ny användare skapad!" });
+    } else {
+      client.close();
+      return res
+        .status(500)
+        .json({ error: "Misslyckades skapa ny användare!" });
+    }
   } catch (e) {
     client.close();
     return res
