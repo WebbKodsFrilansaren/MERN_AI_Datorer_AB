@@ -876,6 +876,47 @@ const putSinglePccomponent = async (req, res, next) => {
   next();
 };
 
+// For PUT /api/pccomponents/:id/images/:arrayindex
+const putSinglePCcomponentImage = async (req, res, next) => {
+  // Check /:id param is valid integer!
+  const isInteger = /^[0-9]+$/.test(req.params?.id);
+  if (
+    !req.params?.id ||
+    typeof req.params?.id !== "string" ||
+    isNaN(req.params?.id) ||
+    !isInteger
+  ) {
+    return res.status(422).json({ error: "Ange ett heltal för komponenten!" });
+  }
+
+  // Check /:arrayindex param is valid integer!
+  const isInteger2 = /^[0-9]+$/.test(req.params?.arrayindex);
+  if (
+    !req.params?.arrayindex ||
+    typeof req.params?.arrayindex !== "string" ||
+    isNaN(req.params?.arrayindex) ||
+    !isInteger2
+  ) {
+    return res
+      .status(422)
+      .json({ error: "Ange ett heltal för bilden för komponenten ifråga!" });
+  }
+
+  // Checks for image file
+  if (!req.file) {
+    return res
+      .status(422)
+      .json({ error: "Skicka med bilden du vill uppdatera med!" });
+  }
+  if (!req.file.mimetype.includes("image")) {
+    return res
+      .status(422)
+      .json({ error: "Skicka en bildfil du vill uppdatera med!" });
+  }
+  // ALL OK!
+  next();
+};
+
 // For DELETE /api/pccomponents/:id
 const deleteSinglePccomponent = async (req, res, next) => {
   // Check /:id param is valid integer!
@@ -891,6 +932,35 @@ const deleteSinglePccomponent = async (req, res, next) => {
   next();
 };
 
+// For DELETE /api/pccomponents/:id/images/:arrayindex
+const deleteSinglePCcomponentImage = async (req, res, next) => {
+  // Check /:id param is valid integer!
+  const isInteger = /^[0-9]+$/.test(req.params?.id);
+  if (
+    !req.params?.id ||
+    typeof req.params?.id !== "string" ||
+    isNaN(req.params?.id) ||
+    !isInteger
+  ) {
+    return res.status(422).json({ error: "Ange ett heltal för komponenten!" });
+  }
+
+  // Check /:arrayindex param is valid integer!
+  const isInteger2 = /^[0-9]+$/.test(req.params?.arrayindex);
+  if (
+    !req.params?.arrayindex ||
+    typeof req.params?.arrayindex !== "string" ||
+    isNaN(req.params?.arrayindex) ||
+    !isInteger2
+  ) {
+    return res
+      .status(422)
+      .json({ error: "Ange ett heltal för bilden för komponenten ifråga!" });
+  }
+  // ALL OK!
+  next();
+};
+
 // Export Middlewares for use!
 module.exports = {
   registerNewUser,
@@ -901,4 +971,6 @@ module.exports = {
   putSingleUser,
   deleteSinglePccomponent,
   deleteSingleUser,
+  putSinglePCcomponentImage,
+  deleteSinglePCcomponentImage,
 };

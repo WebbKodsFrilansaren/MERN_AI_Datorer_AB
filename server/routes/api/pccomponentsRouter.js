@@ -35,6 +35,20 @@ router // GET/:id, PUT/:id, DELETE/:id
     crudPCcomponents.deleteSinglePCcomponent
   );
 
+// PUT /:id/images/:arrayindex - change one image in one :id pccomponent!
+// DELETE /:id/images/:arrayindex - delete one image in one :id pccomponent!
+router
+  .route("/:id/images/:arrayindex")
+  .put(
+    upload.single("componentimages"),
+    validateInputs.putSinglePCcomponentImage,
+    crudPCcomponents.putSinglePCcomponentImage
+  )
+  .delete(
+    validateInputs.deleteSinglePCcomponentImage,
+    crudPCcomponents.deleteSinglePCcomponent
+  );
+
 // CATCH ALL in /api/pccomponents route!
 router.all("*", (req, res) => {
   if (req.headers.accept.includes("html")) {
