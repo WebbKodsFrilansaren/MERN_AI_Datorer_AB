@@ -1,6 +1,7 @@
 require("dotenv").config();
-const { existsSync } = require("fs");
+const { existsSync, readdirSync, unlinkSync, rmdirSync } = require("fs");
 const fs = require("fs/promises");
+const path = require("path");
 
 // GET /api/pccomponents/
 const getAllPCcomponents = async (req, res) => {
@@ -407,6 +408,7 @@ const putSinglePCcomponentImage = async (req, res) => {
     // Find correct user making the request
     const findUser = await dbColUsers.findOne({ username: username });
     if (!findUser) {
+      fs.unlink(req.file.path);
       client.close();
       return res
         .status(403)
@@ -414,6 +416,7 @@ const putSinglePCcomponentImage = async (req, res) => {
     }
     // Then check if they are authorized to continue the request
     if (!findUser.roles.includes("put_images")) {
+      fs.unlink(req.file.path);
       client.close();
       return res
         .status(403)
@@ -427,6 +430,7 @@ const putSinglePCcomponentImage = async (req, res) => {
 
     // PCComponent with /:id doesn't exist
     if (!findSingleComponent) {
+      fs.unlink(req.file.path);
       client.close();
       return res.status(404).json({
         error: `Komponenten med id:${validComponentID} finns inte!`,
@@ -438,6 +442,7 @@ const putSinglePCcomponentImage = async (req, res) => {
       typeof findSingleComponent.componentImages[validImageIndex] ===
       "undefined"
     ) {
+      fs.unlink(req.file.path);
       client.close();
       return res.status(404).json({
         error: `Bilden med index ${validImageIndex} (bildnummer:${
@@ -453,6 +458,7 @@ const putSinglePCcomponentImage = async (req, res) => {
 
     // If image to swap doesn'¨t exist
     if (!existsSync(oldImage)) {
+      fs.unlink(req.file.path);
       client.close();
       return res.status(404).json({
         error: `Bilden med index ${validImageIndex} (bildnummer:${
@@ -502,6 +508,7 @@ const putSinglePCcomponentImage = async (req, res) => {
 
     // If = failed updating component | Else = succeeded updating component
     if (!tryUpdateComponent) {
+      fs.unlink(req.file.path);
       client.close();
       return res
         .status(500)
@@ -514,6 +521,7 @@ const putSinglePCcomponentImage = async (req, res) => {
         .json({ success: "En bild till komponenten har uppdaterats!" });
     }
   } catch (e) {
+    fs.unlink(req.file.path);
     client.close();
     return res
       .status(500)
@@ -523,6 +531,158 @@ const putSinglePCcomponentImage = async (req, res) => {
     if (existsSync(req.file.path)) {
       fs.unlink(req.file.path);
     }
+  }
+};
+
+// POST /api/pccomponents/:id/images/ (add new single image)
+const postSinglePCcomponentImage = async (req, res) => {
+  // Check for authData req object's existence first
+  if (!req.authData || !req.authData?.username) {
+    return res.status(403).json({ error: "Åtkomst nekad!" });
+  }
+
+  // Grab integer from `req.params`
+  const validComponentID = parseInt(req.params.id);
+
+  // Then grab username to check against in database
+  const username = req.authData.username;
+  // Init MongoDB
+  let client;
+
+  try {
+    // Then grab maka2207 database and its collections:
+    client = req.dbClient;
+    const dbColUsers = req.dbCol; // "users"
+    const dbColPCComponents = req.dbCol2; // "pccomponents"
+
+    // Find correct user making the request
+    const findUser = await dbColUsers.findOne({ username: username });
+    if (!findUser) {
+      fs.unlink(req.file.path);
+      client.close();
+      return res
+        .status(403)
+        .json({ error: "Åtkomst nekad! (Ingen användare)" });
+    }
+
+    // Then check if they are authorized to continue the request
+    if (!findUser.roles.includes("post_images")) {
+      fs.unlink(req.file.path);
+      client.close();
+      return res
+        .status(403)
+        .json({ error: "Åtkomst nekad! (Rollen ej tilldelad)" });
+    }
+
+    // Grab PCComponent and filter out based on get_images access:
+    const findSingleComponent = await dbColPCComponents.findOne({
+      componentid: validComponentID,
+    });
+
+    // PCComponent with /:id doesn't exist
+    if (!findSingleComponent) {
+      fs.unlink(req.file.path);
+      client.close();
+      return res.status(404).json({
+        error: `Komponenten med id:${validComponentID} finns inte!`,
+      });
+    }
+
+    // Prepare to POST a single image of a current /:componentid
+    let imgArray = [];
+    let counter = 1;
+    let firstImage = true;
+    let lastImageName = "";
+    const lastDotInFileName = req.file.originalname.lastIndexOf(".");
+    const fileNameWithOutDot = req.file.originalname.slice(
+      0,
+      lastDotInFileName
+    );
+    const imgPath =
+      process.cwd() + "\\server\\images\\" + findSingleComponent.componentid;
+
+    // Set whether it is first image or not so we can do differently from here
+    if (findSingleComponent.componentImages.length > 0) {
+      firstImage = false;
+    }
+
+    // If not first image, store current ones in `imgArray` and store name of last stored image
+    if (!firstImage) {
+      imgArray = findSingleComponent.componentImages;
+      lastImageName = findSingleComponent.componentImages.at(-1);
+
+      // Also set counter to the last uploaded image's counter + 1
+      counter =
+        parseInt(
+          lastImageName
+            .slice(lastImageName.lastIndexOf("-"))
+            .split(".")[0]
+            .split("-")[1]
+        ) + 1;
+    }
+
+    // Create folder /:componentid/ if it doesn't exist
+    if (!existsSync(imgPath)) {
+      fs.mkdir(imgPath);
+    }
+
+    // Push now it to array which is either empty or has all current images!
+    imgArray.push(
+      fileNameWithOutDot +
+        "-" +
+        counter +
+        req.file.originalname.slice(lastDotInFileName)
+    );
+
+    // Move file into correct /:componentid/ folder
+    try {
+      fs.rename(
+        req.file.path,
+        imgPath +
+          "\\" +
+          fileNameWithOutDot +
+          "-" +
+          counter +
+          req.file.originalname.slice(lastDotInFileName)
+      );
+    } catch (e) {
+      fs.unlink(req.file.path);
+      client.close();
+      return res
+        .status(500)
+        .json({ error: "Databasfel. Kontakta Systemadministratören!" });
+    }
+
+    // Then prepare for updating correct :componentid and its images
+    const postSingleImage = {
+      componentImages: imgArray,
+    };
+
+    // Then, try updating it
+    const tryPostSingleImage = await dbColPCComponents.updateOne(
+      { componentid: validComponentID },
+      { $set: postSingleImage }
+    );
+
+    // if = succeeded inserting new component | else = failed trying it
+    if (tryPostSingleImage) {
+      client.close();
+      return res
+        .status(200)
+        .json({ success: "En bild till komponenten har laddats upp" });
+    } else {
+      fs.unlink(req.file.path);
+      client.close();
+      return res
+        .status(500)
+        .json({ error: "Databasfel. Kontakta Systemadministratören!" });
+    }
+  } catch (e) {
+    fs.unlink(req.file.path);
+    client.close();
+    return res
+      .status(500)
+      .json({ error: "Databasfel. Kontakta Systemadministratören!" });
   }
 };
 
@@ -579,6 +739,17 @@ const deleteSinglePCcomponent = async (req, res) => {
     });
 
     if (deleteSingleComponent.deletedCount === 1) {
+      // Remove folder with all images inside of it
+      const imgPath = process.cwd() + "\\server\\images\\" + validID;
+      if (existsSync(imgPath)) {
+        // Grab any files and delete each file before the folder itself
+        const files = readdirSync(imgPath);
+        files.forEach((file) => {
+          const filePath = path.join(imgPath, file);
+          unlinkSync(filePath);
+        });
+        rmdirSync(imgPath);
+      }
       client.close();
       return res.status(200).json({
         success: `Datorkomponenten med id:${validID} raderad!`,
@@ -591,6 +762,7 @@ const deleteSinglePCcomponent = async (req, res) => {
       });
     }
   } catch (e) {
+    console.log(e);
     client.close();
     return res
       .status(500)
@@ -721,4 +893,5 @@ module.exports = {
   deleteSinglePCcomponent,
   deleteSinglePCcomponentImage,
   putSinglePCcomponentImage,
+  postSinglePCcomponentImage,
 };
