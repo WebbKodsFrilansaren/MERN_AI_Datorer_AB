@@ -6,7 +6,7 @@ function App() {
   return (
     <div className="mx-auto">
       <Header />
-      <main className="mx-auto max-w-screen-xl p-4">Test</main>
+      <main className="mx-auto max-w-screen-xl p-4">Placera router här</main>
       <Footer />
     </div>
   );
