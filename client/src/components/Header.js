@@ -1,12 +1,10 @@
 import "../App.css";
 import { useState, useEffect } from "react";
 
-function Header() {
+function Header({ isLoggedIn, isAdmin }) {
   // Some initial state that are false because we use fetch() to know what access we have
-  const [isLoggedIn, setIsLoggedIn] = useState(false); // Is logged in so menu shows?
-  const [isAdmin, setIsAdmin] = useState(false); // Is admin so "Admin" item shows?
+  // "isLoggedIn" = shows <nav> or not | "isAdmin" = shows "Admin" link in <nav> when visible or not
   const [showMobileMenu, setShowMobileMenu] = useState(false); // Toggle Hamburger Menu when logged in
-  const [accesses, setAccesses] = useState([""]); // store CRUD_components/CRUD_images here
 
   // useEffect for handling hamburger menu
   useEffect(() => {
