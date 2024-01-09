@@ -31,7 +31,7 @@ router // GET/:id, PUT/:id, DELETE/:id
     crudPCcomponents.putSinglePCcomponent
   )
   .delete(
-    validateInputs.deleteSinglePccomponent,
+    validateInputs.deleteSinglePCcomponentImage,
     crudPCcomponents.deleteSinglePCcomponent
   );
 
@@ -46,7 +46,7 @@ router
   )
   .delete(
     validateInputs.deleteSinglePCcomponentImage,
-    crudPCcomponents.deleteSinglePCcomponent
+    crudPCcomponents.deleteSinglePCcomponentImage
   );
 
 // CATCH ALL in /api/pccomponents route!

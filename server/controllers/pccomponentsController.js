@@ -1,7 +1,6 @@
 require("dotenv").config();
 const { existsSync } = require("fs");
 const fs = require("fs/promises");
-const { parse } = require("path");
 
 // GET /api/pccomponents/
 const getAllPCcomponents = async (req, res) => {
@@ -599,6 +598,120 @@ const deleteSinglePCcomponent = async (req, res) => {
   }
 };
 
+// DELETE /api/pccomponents/:id/images/:arrayindex
+const deleteSinglePCcomponentImage = async (req, res) => {
+  // Check for authData req object's existence first
+  if (!req.authData || !req.authData?.username) {
+    return res.status(403).json({ error: "Åtkomst nekad!" });
+  }
+
+  // Grab integer from `req.params`
+  const validComponentID = parseInt(req.params.id);
+  const validImageIndex = parseInt(req.params.arrayindex);
+
+  // Then grab username to check against in database
+  const username = req.authData.username;
+  // Init MongoDB
+  let client;
+  try {
+    // Then grab maka2207 database and its collections:
+    client = req.dbClient;
+    const dbColUsers = req.dbCol; // "users"
+    const dbColPCComponents = req.dbCol2; // "pccomponents"
+
+    // Find correct user making the request
+    const findUser = await dbColUsers.findOne({ username: username });
+    if (!findUser) {
+      client.close();
+      return res
+        .status(403)
+        .json({ error: "Åtkomst nekad! (Ingen användare)" });
+    }
+    // Then check if they are authorized to continue the request
+    if (!findUser.roles.includes("delete_images")) {
+      client.close();
+      return res
+        .status(403)
+        .json({ error: "Åtkomst nekad! (Rollen ej tilldelad)" });
+    }
+
+    // Grab PCComponent and filter out based on get_images access:
+    const findSingleComponent = await dbColPCComponents.findOne({
+      componentid: validComponentID,
+    });
+
+    // PCComponent with /:id doesn't exist
+    if (!findSingleComponent) {
+      client.close();
+      return res.status(404).json({
+        error: `Komponenten med id:${validComponentID} finns inte!`,
+      });
+    }
+
+    // When :arrayindex (index of image in array of images) doesn't exist
+    if (
+      typeof findSingleComponent.componentImages[validImageIndex] ===
+      "undefined"
+    ) {
+      client.close();
+      return res.status(404).json({
+        error: `Bilden med index ${validImageIndex} (bildnummer:${
+          validImageIndex + 1
+        }) i komponenten med id:${validComponentID} finns inte!`,
+      });
+    }
+    // Prepare image to delete exists
+    const imgPath = process.cwd() + "\\server\\images\\" + validComponentID;
+    const imageToDelete =
+      imgPath + "\\" + findSingleComponent.componentImages[validImageIndex];
+
+    // If image don't exist
+    if (!existsSync(imageToDelete)) {
+      client.close();
+      return res.status(404).json({
+        error: `Bilden med index ${validImageIndex} (bildnummer:${
+          validImageIndex + 1
+        }) i komponenten med id:${validComponentID} finns inte!`,
+      });
+    }
+    // When it exists, first prepare it by removing it from array
+    const newImgArray = findSingleComponent.componentImages.filter(
+      (_, index) => index !== validImageIndex
+    );
+
+    // Prepare updating
+    const updateComponent = {
+      componentImages: newImgArray,
+    };
+
+    // Then, try updating it
+    const tryUpdateComponent = await dbColPCComponents.updateOne(
+      { componentid: validComponentID },
+      { $set: updateComponent }
+    );
+
+    // If = failed updating component | Else = succeeded updating component
+    if (!tryUpdateComponent) {
+      client.close();
+      return res
+        .status(500)
+        .json({ error: "Misslyckades att radera bilden till komponenten!" });
+    } else {
+      // Delete image file since we succeeded in updating in DB!
+      fs.unlink(imageToDelete);
+      client.close();
+      return res
+        .status(200)
+        .json({ success: "En bild till komponenten har raderats!" });
+    }
+  } catch (e) {
+    client.close();
+    return res
+      .status(500)
+      .json({ error: "Databasfel. Kontakta Systemadministratören!" });
+  }
+};
+
 // Export CRUDs for use!
 module.exports = {
   getAllPCcomponents,
@@ -606,5 +719,6 @@ module.exports = {
   putSinglePCcomponent,
   postSinglePCcomponent,
   deleteSinglePCcomponent,
+  deleteSinglePCcomponentImage,
   putSinglePCcomponentImage,
 };
