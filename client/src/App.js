@@ -7,6 +7,7 @@ function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false); // Is logged in so menu shows?
   const [isAdmin, setIsAdmin] = useState(false); // Is admin so "Admin" item shows?
   const [accesses, setAccesses] = useState([""]); // store CRUD_components/CRUD_images here
+  const [RxNd4UC6C2KfNssrkAYa, setRxNd4UC6C2KfNssrkAYa] = useState(""); // Store access_token here in memory, NOT anywhere else!
 
   return (
     <div className="mx-auto">
