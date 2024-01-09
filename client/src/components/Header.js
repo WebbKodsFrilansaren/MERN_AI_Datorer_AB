@@ -42,10 +42,7 @@ function Header({ isLoggedIn, isAdmin }) {
           AI DATORER AB Intranät
         </a>
         {isLoggedIn && (
-          <ul
-            className={`hidden md:flex space-x-4 p-2 mr-4 ${
-              isLoggedIn ? "flex" : "hidden"
-            }`}>
+          <ul className={`hidden md:flex space-x-4 p-2 mr-4`}>
             <li className="text-white cursor-pointer hover:underline font-bold">
               Start
             </li>
@@ -65,9 +62,10 @@ function Header({ isLoggedIn, isAdmin }) {
           </ul>
         )}
         {isLoggedIn && (
-          <div className={`md:hidden mr-2`}>
+          <div
+            onClick={() => setShowMobileMenu((prev) => !prev)}
+            className="md:hidden mr-2">
             <button
-              onClick={() => setShowMobileMenu((prev) => !prev)}
               id="mobile-menu-button"
               className="text-white p-2 focus:outline-none">
               <span className="block w-7 h-1 bg-white mb-1"></span>
