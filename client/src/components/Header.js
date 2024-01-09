@@ -3,9 +3,10 @@ import { useState, useEffect } from "react";
 
 function Header() {
   // Some initial state that are false because we use fetch() to know what access we have
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [isAdmin, setIsAdmin] = useState(false);
-  const [showMobileMenu, setShowMobileMenu] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false); // Is logged in so menu shows?
+  const [isAdmin, setIsAdmin] = useState(false); // Is admin so "Admin" item shows?
+  const [showMobileMenu, setShowMobileMenu] = useState(false); // Toggle Hamburger Menu when logged in
+  const [accesses, setAccesses] = useState([""]); // store CRUD_components/CRUD_images here
 
   // useEffect for handling hamburger menu
   useEffect(() => {
