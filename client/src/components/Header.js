@@ -43,7 +43,7 @@ function Header({ isLoggedIn, isAdmin }) {
         </a>
         {isLoggedIn && (
           <ul
-            className={`md:flex space-x-4 p-2 mr-4 ${
+            className={`hidden md:flex space-x-4 p-2 mr-4 ${
               isLoggedIn ? "flex" : "hidden"
             }`}>
             <li className="text-white cursor-pointer hover:underline font-bold">
