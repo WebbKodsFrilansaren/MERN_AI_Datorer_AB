@@ -176,6 +176,7 @@ const postSingleUser = async (req, res) => {
       account_blocked: req.body.account_blocked ? true : false,
       account_activated: req.body.account_activated ? true : false,
       roles: roles,
+      last_login: "",
       userid: nextUserId,
     };
 

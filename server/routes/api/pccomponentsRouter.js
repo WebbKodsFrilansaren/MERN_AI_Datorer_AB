@@ -16,8 +16,8 @@ router
   .route("/")
   .get(crudPCcomponents.getAllPCcomponents)
   .post(
+    upload.array("componentimages"),
     validateInputs.postSinglePccomponent,
-    upload.array("images", 7),
     crudPCcomponents.postSinglePCcomponent
   ); // GET + POST
 router // GET/:id, PUT/:id, DELETE/:id

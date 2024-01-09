@@ -623,9 +623,10 @@ const getSinglePccomponent = async (req, res, next) => {
   next();
 };
 
-// For POST /api/pccomponents
+// For POST /api/pccomponents <IMPORTANT: form-data so all are strings to be parsed!>
 const postSinglePccomponent = async (req, res, next) => {
   // CHECKS for "componentname"
+  console.log(req.body);
   if (!req.body?.componentname || !req.body.componentname === "") {
     return res.status(422).json({ error: "Ange ett namn för komponenten!" });
   }
@@ -678,12 +679,7 @@ const postSinglePccomponent = async (req, res, next) => {
       .json({ error: "Ange ett pris för komponenten i heltal!" });
   }
   const isInteger = /^[0-9]+$/.test(req.body.componentprice);
-  if (
-    !req.body.componentprice ||
-    typeof req.body.componentprice !== "number" ||
-    isNaN(req.body.componentprice) ||
-    !isInteger
-  ) {
+  if (isNaN(req.body.componentprice) || !isInteger) {
     return res
       .status(422)
       .json({ error: "Komponentens pris ska vara ett heltal!" });
@@ -692,7 +688,7 @@ const postSinglePccomponent = async (req, res, next) => {
   // CHECKS for "componentamount"
   if (
     !Object.hasOwn(req.body, "componentamount") ||
-    typeof req.body?.componentamount !== "number"
+    typeof req.body?.componentamount !== "string"
   ) {
     return res.status(422).json({ error: "Ange komponentens antal i heltal!" });
   }
@@ -702,11 +698,7 @@ const postSinglePccomponent = async (req, res, next) => {
       .json({ error: "Komponentens antal får inte vara lägre än 0!" });
   }
   const isInteger2 = /^[0-9]+$/.test(req.body.componentamount);
-  if (
-    typeof req.body.componentamount !== "number" ||
-    isNaN(req.body.componentamount) ||
-    !isInteger2
-  ) {
+  if (isNaN(req.body.componentamount) || !isInteger2) {
     return res
       .status(422)
       .json({ error: "Komponentens antal ska vara ett heltal!" });
@@ -715,18 +707,36 @@ const postSinglePccomponent = async (req, res, next) => {
   // CHECKS for "componentstatus"
   if (
     !Object.hasOwn(req.body, "componentstatus") ||
-    typeof req.body?.componentstatus !== "boolean"
+    typeof req.body?.componentstatus !== "string"
   ) {
     return res
       .status(422)
       .json({ error: "Ange komponentens status - ny eller begagnad!" });
   }
+  if (
+    req.body.componentstatus.toLowerCase() !== "true" &&
+    req.body.componentstatus.toLowerCase() !== "false"
+  ) {
+    return res
+      .status(422)
+      .json({ error: "Ange komponentens status - ny eller begagnad!" });
+  }
+
   // CHECKS for "componentcategories"
-  if (!Object.hasOwn(req.body, "componentcategories")) {
+  if (
+    !Object.hasOwn(req.body, "componentcategories") ||
+    typeof req.body?.componentcategories !== "string"
+  ) {
     return res
       .status(422)
       .json({ error: "Ange färst en kategori för komponenten!" });
   }
+  // Turn categories string into an array
+  let catArray = req.body.componentcategories
+    .split(/,|, | \| | \|/)
+    .map((cat) => cat.trim())
+    .filter((cat) => cat.trim() !== "");
+  req.body.componentcategories = catArray;
   if (
     !Array.isArray(req.body.componentcategories) ||
     req.body.componentcategories?.length == 0
@@ -735,9 +745,7 @@ const postSinglePccomponent = async (req, res, next) => {
       .status(422)
       .json({ error: "Ange färst en kategori för komponenten!" });
   }
-
-  // CHECKS for "componentimages"
-
+  // ALL OK! Images are processed by `const postSingleComponent` in `pccomponentsController.js`
   next();
 };
 
@@ -864,8 +872,7 @@ const putSinglePccomponent = async (req, res, next) => {
       .json({ error: "Ange färst en kategori för komponenten!" });
   }
 
-  // CHECKS for "componentimages"
-
+  // ALL OK!
   next();
 };
 

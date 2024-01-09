@@ -1,4 +1,6 @@
 require("dotenv").config();
+const { existsSync } = require("fs");
+const fs = require("fs/promises");
 
 // GET /api/pccomponents/
 const getAllPCcomponents = async (req, res) => {
@@ -171,13 +173,11 @@ const postSinglePCcomponent = async (req, res) => {
     return res.status(403).json({ error: "Åtkomst nekad!" });
   }
 
-  // Grab integer from `req.params`
-  const validID = parseInt(req.params.id);
-
   // Then grab username to check against in database
   const username = req.authData.username;
   // Init MongoDB
   let client;
+  let nextComponentId = 1;
   try {
     // Then grab maka2207 database and its collections:
     client = req.dbClient;
@@ -192,6 +192,7 @@ const postSinglePCcomponent = async (req, res) => {
         .status(403)
         .json({ error: "Åtkomst nekad! (Ingen användare)" });
     }
+
     // Then check if they are authorized to continue the request
     if (!findUser.roles.includes("post_components")) {
       client.close();
@@ -200,59 +201,103 @@ const postSinglePCcomponent = async (req, res) => {
         .json({ error: "Åtkomst nekad! (Rollen ej tilldelad)" });
     }
 
-    // Check if user also is allowed to get images when data is returned!
+    // Check if user also is allowed to post images when uploading new component!
     let includeImgFiles = true;
     if (!findUser.roles.includes("post_images")) {
-      includeImgFiles = false;
-      return res
-        .status(403)
-        .json({ error: "Åtkomst nekad! (Rollen ej tilldelad)" });
+      includeImgFiles = false; // False, so even if images were sent they will be ignored
     }
-    // Grab PCComponent and filter out based on get_images access:
-    const findSingleComponent = await dbColPCComponents.findOne({
-      componentid: validID,
-    });
 
-    // PCComponent with /:id doesn't exist
-    if (!findSingleComponent) {
-      client.close();
-      return res.status(404).json({
-        error: `Datorkomponenten med id:${validID} finns inte!`,
+    // Find highest current value of `componentid` by sorting it from max value and just
+    const highestComponentId = await dbColPCComponents
+      .find()
+      .sort({ componentid: -1 })
+      .limit(1)
+      .next();
+
+    // If DOES exist then nextComponentId is that plus one, otherwise it's first component!
+    if (highestComponentId) {
+      nextComponentId = highestComponentId.componentid + 1;
+    }
+
+    // Handle possible images uploaded
+    let imgArray = [];
+    const imgPath = process.cwd() + "\\server\\images\\" + nextComponentId;
+
+    // if = files exist AND user is allowed to post them!
+    if (req.files !== undefined && includeImgFiles) {
+      let counter = 1;
+      // Create folder /:componentid/ if it doesn't exist
+      if (!existsSync(imgPath)) fs.mkdir(imgPath);
+
+      // Then loop through each file and move those who are valid image files
+      req.files.forEach((file) => {
+        // Remove invalid files (not image/* mimetypes!)
+        if (!file.mimetype.includes("image")) {
+          fs.unlink(file.path);
+        } // WHEN CORRECT FILE TYPES: Rename valid files, add to imgArray[], and then move them to folder `imgPath`
+        else {
+          const lastDotInFileName = file.originalname.lastIndexOf(".");
+          const fileNameWithOutDot = file.originalname.slice(
+            0,
+            lastDotInFileName
+          );
+          fs.rename(
+            file.path,
+            imgPath +
+              "\\" +
+              fileNameWithOutDot +
+              "-" +
+              counter +
+              file.originalname.slice(lastDotInFileName)
+          );
+          imgArray.push(
+            fileNameWithOutDot +
+              "-" +
+              counter +
+              file.originalname.slice(lastDotInFileName)
+          );
+          counter++;
+        }
       });
+    } // else if = files sent but user not allowed to post them
+    else if (req.files !== undefined && !includeImgFiles) {
+      req.files.forEach((file) => fs.unlink(file.path));
     }
 
-    // When it exists, return it filtered with images or without
-    filterData = {
-      componentid: findSingleComponent.componentid,
-      componentName: findSingleComponent.componentName,
-      componentDescription: findSingleComponent.componentDescription,
-      componentPrice: findSingleComponent.componentPrice,
-      componentAmount: findSingleComponent.componentAmount,
-      componentStatus: findSingleComponent.componentStatus,
-      componentCategories: findSingleComponent.componentCategories,
+    // Finalize component to insert in DB
+    const postNewComponent = {
+      componentid: nextComponentId,
+      componentName: req.body.componentname,
+      componentDescription: req.body.componentdescription,
+      componentPrice: parseInt(req.body.componentprice),
+      componentAmount: parseInt(req.body.componentamount),
+      componentStatus:
+        req.body.componentstatus.toLowerCase() === "true" ? "Ny" : "Begagnad",
+      componentCategories: req.body.componentcategories,
+      componentImages: includeImgFiles ? imgArray : "",
     };
 
-    // Finally return the single filtered PC Component!
-    client.close();
-    return res.status(200).json({
-      success: "Datorkomponent hämtad!",
-      data: filterData,
-    });
+    // Try inserting new component now finally - with or without images!
+    const tryPostComponent = await dbColPCComponents.insertOne(
+      postNewComponent
+    );
+
+    // if = succeeded inserting new component | else = failed trying it
+    if (tryPostComponent) {
+      client.close();
+      return res.status(200).json({ success: "Komponenten har lagts till!" });
+    } else {
+      client.close();
+      return res
+        .status(500)
+        .json({ error: "Databasfel. Kontakta Systemadministratören!" });
+    }
   } catch (e) {
     client.close();
     return res
       .status(500)
       .json({ error: "Databasfel. Kontakta Systemadministratören!" });
   }
-
-  if (req.files === undefined) {
-    console.log("Inga bilder uppladdade!");
-  } else {
-    console.log(req.files);
-  }
-
-  console.log(process.cwd() + "\\server\\images");
-  return res.status(200).json({ success: "POST Single PCComponent!" });
 };
 
 // PUT /api/pccomponents/:id
