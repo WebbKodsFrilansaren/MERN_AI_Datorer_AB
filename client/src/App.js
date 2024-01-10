@@ -16,7 +16,7 @@ function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false); // Is logged in so menu shows?
   const [isAdmin, setIsAdmin] = useState(false); // Is admin so "Admin" item shows?
   const [accesses, setAccesses] = useState([]); // store CRUD_components/CRUD_images here
-  const [aToken, setAToken] = useState("access_token saknas!"); // Store access_token here in memory, NOT anywhere else!
+  const [aToken, setAToken] = useState(""); // Store access_token here in memory, NOT anywhere else!
 
   // This function grabs the received "atoken" from the child "Login.js" after successful login
   // and then stores it in memory in the state variable "RxNd4UC6C2KfNssrkAYa" which is then

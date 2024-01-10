@@ -31,7 +31,7 @@ const registerUser = async (req, res) => {
     const checkSysAdmin = await dbColUsers.findOne({
       userfullname: "Systemadministratören",
     });
-    if (checkSysAdmin) {
+    if (checkSysAdmin && req.body.fullname.toLowerCase().includes("system")) {
       return res
         .status(400)
         .json({ error: "Felaktigt format i det fullständiga namnet!" });
@@ -75,9 +75,9 @@ const registerUser = async (req, res) => {
     // Check if successful
     if (insertUser) {
       client.close();
-      return res
-        .status(201)
-        .json({ success: "Användare skapad. Vänligen logga in!" });
+      return res.status(201).json({
+        success: "Konto skapat! Skickas till inloggning...",
+      });
     } else {
       client.close();
       return res

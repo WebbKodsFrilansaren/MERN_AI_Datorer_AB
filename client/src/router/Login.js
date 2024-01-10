@@ -1,11 +1,14 @@
 import "../App.css";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
+import AuthContext from "../middleware/AuthContext";
 axios.defaults.baseURL = "http://localhost:5000/api";
 
 // Props that can be used to tell "parent" component something happened on our end
 function Login({ setAccessToken, setLoginSuccess, setAdmin }) {
+  // Current access_token value when navigating here!
+  const { aToken, setAToken } = useContext(AuthContext);
   // States for body for login, access_token to send to Parent when "loggedIn = true",
   // and errorMsgs array with errors provided by REST API
   const [loginBody, setLoginBody] = useState({ username: "", password: "" });
@@ -46,6 +49,8 @@ function Login({ setAccessToken, setLoginSuccess, setAdmin }) {
           },
           {
             withCredentials: true, // Include credentials (cookies)
+            // This prevents from throwing errors (catch(e))
+            validateStatus: () => true,
           }
         );
         if (res.status === 200) {
@@ -56,12 +61,19 @@ function Login({ setAccessToken, setLoginSuccess, setAdmin }) {
           if ("isAdmin" in res.data) {
             setAdmin(true);
           }
+        } else {
+          setErrMsgs((prev) => {
+            return {
+              ...prev,
+              errLogin: res.data.error,
+            };
+          });
         }
-      } catch (error) {
+      } catch (e) {
         setErrMsgs((prev) => {
           return {
             ...prev,
-            errLogin: "Användarnamnet eller lösenordet är ogiltigt!",
+            errLogin: "Kontakta Webbutvecklaren för klienthjälp. Bugg!",
           };
         });
       }
@@ -130,12 +142,14 @@ function Login({ setAccessToken, setLoginSuccess, setAdmin }) {
               <p className="text-red-500 font-bold">{errorMsgs.errPass}</p>
             </div>
             <div>
-              <button
-                onClick={loginClick}
-                type="submit"
-                className="w-full bg-gray-500 text-white font-bold p-2 rounded-md hover:bg-gray-600">
-                Logga in
-              </button>
+              {!loggedInSuccess && (
+                <button
+                  onClick={loginClick}
+                  type="submit"
+                  className="w-full bg-gray-500 text-white font-bold p-2 rounded-md hover:bg-gray-600">
+                  Logga in
+                </button>
+              )}
               <p className="text-red-500 font-bold">{errorMsgs.errLogin}</p>
               <p className="text-green-500 font-bold text-center">
                 {loggedInSuccess}
