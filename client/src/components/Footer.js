@@ -1,5 +1,5 @@
+// Just the <Footer/> component and nothing more
 import "../App.css";
-
 function Footer() {
   return (
     <footer className="bg-gray-800 p-4 text-white">
@@ -8,8 +8,8 @@ function Footer() {
         efter betygsatt projektuppgift!
       </p>
       <p className="text-sm text-center font-bold mx-4 my-4">
-        &copy;2023 WebbKodsLärlingen | AI DATORER AB | Projektuppgift HT2023
-        DT162G
+        &copy;2023-2024 WebbKodsLärlingen | AI DATORER AB | Projektuppgift
+        HT2023 DT162G
       </p>
     </footer>
   );

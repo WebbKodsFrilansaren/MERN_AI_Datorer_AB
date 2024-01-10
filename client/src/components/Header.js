@@ -1,10 +1,9 @@
 import "../App.css";
 import { useState, useEffect, useContext } from "react";
-import { Link, useNavigate, Route } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import AuthContext from "../middleware/AuthContext";
-import axios from "axios";
 import ModalLogout from "./ModalLogout";
-axios.defaults.baseURL = "http://localhost:5000/api";
+import axios from "../middleware/axios";
 
 function Header({
   isLoggedIn,

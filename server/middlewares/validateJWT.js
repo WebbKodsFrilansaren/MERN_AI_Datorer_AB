@@ -12,20 +12,23 @@ const jwt = require("jsonwebtoken");
 // Validate Access Token! (used as a Middleware)
 const validateAccessToken = async (req, res, next) => {
   // Check if access_token exists (stored in authorization)
-  if (!req.headers.authorization && !req.headers.Authorization) {
+  // Get the authorization header in a case-insensitive manner
+  const authorizationHeader =
+    req.headers?.authorization || req.headers?.Authorization;
+  if (!authorizationHeader) {
     return res.status(403).json({ error: "Åtkomst nekad!" });
   }
   // Check if authorization header begins with "Bearer "
   if (
-    !req.headers.authorization.includes("Bearer ") &&
-    !req.headers.Authorization.includes("Bearer ")
+    !req.headers?.authorization?.includes(" ") &&
+    !req.headers?.Authorization?.includes(" ")
   ) {
     return res.status(403).json({ error: "Åtkomst nekad!" });
   }
   // Store access token and try decoding it
   const aToken =
-    req.headers.authorization.split("Bearer ")[1] ||
-    req.headers.Authorization.split("Bearer ")[1];
+    req.headers?.authorization?.split(" ")[1] ||
+    req.headers?.Authorization?.split(" ")[1];
   try {
     // IMPORTANT: jwt.verify will FAIL if access token has expired despite being otherwise correct!
     const decoded = jwt.verify(aToken, tokenKey);

@@ -1,9 +1,8 @@
 import "../App.css";
 import { useState, useEffect, useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import axios from "axios";
 import AuthContext from "../middleware/AuthContext";
-axios.defaults.baseURL = "http://localhost:5000/api";
+import axios from "../middleware/axios";
 
 // Props that can be used to tell "parent" component something happened on our end
 function Login({ setAccessToken, setLoginSuccess, setAdmin }) {
