@@ -18,6 +18,9 @@ app.use(cors(corsOptions));
 // Initialize cookieParser!
 app.use(cookieParser());
 
+// Default place for images
+app.use("/images", express.static(path.join(__dirname, "images")));
+
 // Use the "root.js" main router file to send all HTTP requests beginning with "/api/" there
 app.use("/api", require("./routes/root.js"));
 

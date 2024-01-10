@@ -5,9 +5,11 @@ import Footer from "./components/Footer";
 import { useState, useEffect } from "react";
 
 // Routing and router components
-import { Route, Routes } from "react-router-dom";
+import { Route, Routes, useNavigate } from "react-router-dom";
 import Login from "./router/Login";
 import Register from "./router/Register";
+import Start from "./router/Start";
+import NotFound from "./router/NotFound";
 
 // Global components thanks to useContext()
 import AuthContext from "./middleware/AuthContext"; // useContext for:"aToken, setAToken"
@@ -52,11 +54,18 @@ function App() {
   return (
     <AuthContext.Provider value={{ aToken, setAToken }}>
       <div className="mx-auto">
-        <Header isLoggedIn={isLoggedIn} isAdmin={isAdmin} />
+        <Header
+          isLoggedIn={isLoggedIn}
+          isAdmin={isAdmin}
+          setAccessToken={setAccessToken}
+          setLoginSuccess={setLoginSuccess}
+          setAdmin={setAdmin}
+        />
         <main className="mx-auto max-w-screen-xl p-4">
           <Routes>
+            <Route path="/" element={<Start />}></Route>
             <Route
-              path="/"
+              path="/login"
               element={
                 <Login
                   setAccessToken={setAccessToken}
@@ -65,6 +74,7 @@ function App() {
                 />
               }></Route>
             <Route path="/register" element={<Register />}></Route>
+            <Route path="/*" element={<NotFound />}></Route>
           </Routes>
         </main>
         <Footer />

@@ -1,6 +1,6 @@
 import "../App.css";
 import { useState, useEffect, useContext } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import AuthContext from "../middleware/AuthContext";
 axios.defaults.baseURL = "http://localhost:5000/api";
@@ -8,7 +8,11 @@ axios.defaults.baseURL = "http://localhost:5000/api";
 // Props that can be used to tell "parent" component something happened on our end
 function Login({ setAccessToken, setLoginSuccess, setAdmin }) {
   // Current access_token value when navigating here!
-  const { aToken, setAToken } = useContext(AuthContext);
+  const { aToken } = useContext(AuthContext);
+
+  // Navigate and redirect user with this!
+  const navigate = useNavigate();
+
   // States for body for login, access_token to send to Parent when "loggedIn = true",
   // and errorMsgs array with errors provided by REST API
   const [loginBody, setLoginBody] = useState({ username: "", password: "" });
@@ -17,6 +21,13 @@ function Login({ setAccessToken, setLoginSuccess, setAdmin }) {
     errUser: "",
     errPass: "",
     errLogin: "",
+  });
+
+  // If user is already logged in, take them to starting page!
+  useEffect(() => {
+    if (aToken.includes("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9")) {
+      navigate("/");
+    }
   });
 
   // Handle login click
@@ -58,9 +69,15 @@ function Login({ setAccessToken, setLoginSuccess, setAdmin }) {
           setAccessToken(res.data.accessToken);
           setLoginSuccess(true);
           setloggedInSuccess(res.data.success);
+          // Also tell if it is admin user
           if ("isAdmin" in res.data) {
             setAdmin(true);
           }
+          // Then move to Start page and also reset login
+          setTimeout(() => {
+            setloggedInSuccess(false);
+            navigate("/");
+          }, 3333);
         } else {
           setErrMsgs((prev) => {
             return {
@@ -97,13 +114,6 @@ function Login({ setAccessToken, setLoginSuccess, setAdmin }) {
     }
   };
 
-  useEffect(() => {
-    // Init
-
-    // Cleanup
-    return () => {};
-  }, []);
-
   // Returned JSX DOM Data Dynamic
   return (
     <div className="container mx-auto p-4 min-h-screen">
@@ -113,7 +123,7 @@ function Login({ setAccessToken, setLoginSuccess, setAdmin }) {
           <form>
             <div className="mb-4">
               <label
-                for="username"
+                htmlFor="username"
                 className="block text-sm font-medium text-gray-600">
                 Användarnamn
               </label>
@@ -128,7 +138,7 @@ function Login({ setAccessToken, setLoginSuccess, setAdmin }) {
             </div>
             <div className="mb-4">
               <label
-                for="password"
+                htmlFor="password"
                 className="block text-sm font-medium text-gray-600">
                 Lösenord
               </label>

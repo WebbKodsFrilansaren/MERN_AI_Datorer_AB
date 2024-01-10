@@ -101,6 +101,7 @@ const loginPOST = async (req, res) => {
           res.cookie("jwt", refreshToken, {
             httpOnly: true,
             sameSite: "None",
+            secure: process.env.NODE_ENV === "production",
             maxAge: 1000 * 60 * 60 * 24,
           });
           // if logged in user is "sysadmin" also include a property for that which is true
