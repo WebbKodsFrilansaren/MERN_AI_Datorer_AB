@@ -20,9 +20,8 @@ function App() {
   const [accesses, setAccesses] = useState([]); // store CRUD_components/CRUD_images here
   const [aToken, setAToken] = useState(""); // Store access_token here in memory, NOT anywhere else!
 
-  // This function grabs the received "atoken" from the child "Login.js" after successful login
-  // and then stores it in memory in the state variable "RxNd4UC6C2KfNssrkAYa" which is then
-  // used by axios for fetch making requests.
+  // This function grabs the received "atoken" from the child "Login.js" after successful login and then
+  // stores it in memory in the state variable "aToken" which is then used by axios for fetch making requests.
   const setAccessToken = (token) => {
     setAToken(token);
   };

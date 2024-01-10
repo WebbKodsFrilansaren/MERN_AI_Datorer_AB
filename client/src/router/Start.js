@@ -19,7 +19,6 @@ function Start() {
   });
 
   // States to show one product
-  const [showProduct, setShowProduct] = useState(false);
   const [latestProduct, setlatestProduct] = useState(null);
   const [errorMsgs, setErrMsgs] = useState({ errProduct: "" });
 
@@ -51,6 +50,8 @@ function Start() {
       });
   }, []);
 
+  if (!latestProduct) return <div>Provar ladda in produkt...</div>;
+
   return (
     <div className="min-h-screen">
       <h1 className="text-4xl font-bold text-center mb-4">
@@ -79,7 +80,7 @@ function Start() {
             </p>
             <p className="px-4">
               <span className="font-bold">Kategorier: </span>{" "}
-              {latestProduct.componentCategories}
+              {latestProduct.componentCategories.join(", ")}
             </p>
             <p className="px-4">
               <span className="font-bold">Beskrivning: </span>{" "}
