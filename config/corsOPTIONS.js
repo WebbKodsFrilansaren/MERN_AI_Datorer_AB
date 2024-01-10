@@ -2,9 +2,10 @@
 // This file is used by "server.js"
 const corsOptions = {
   origin: "http://localhost:3000",
-  methods: "GET,HEAD,PUT,POST,DELETE", // Allow only the following HTTP request methods!
+  methods: "GET,HEAD,PUT,POST,DELETE,OPTIONS", // Allow only the following HTTP request methods!
   credentials: true, // Allow cookies
   optionsSuccessStatus: 204,
+  allowedHeaders: "Content-Type, Authorization",
 };
 
 // Export it for use!

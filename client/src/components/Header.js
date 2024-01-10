@@ -1,10 +1,15 @@
 import "../App.css";
 import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
+import axios from "axios";
+axios.defaults.baseURL = "http://localhost:5000/api";
 
 function Header({ isLoggedIn, isAdmin }) {
   // Some initial state that are false because we use fetch() to know what access we have
   // "isLoggedIn" = shows <nav> or not | "isAdmin" = shows "Admin" link in <nav> when visible or not
   const [showMobileMenu, setShowMobileMenu] = useState(false); // Toggle Hamburger Menu when logged in
+
+  const logoutClick = (click) => {};
 
   // useEffect for handling hamburger menu
   useEffect(() => {
@@ -44,7 +49,7 @@ function Header({ isLoggedIn, isAdmin }) {
         {isLoggedIn && (
           <ul className={`hidden md:flex space-x-4 p-2 mr-4`}>
             <li className="text-white cursor-pointer hover:underline font-bold">
-              Start
+              <Link to="/login">Start</Link>
             </li>
             {isAdmin && (
               <li className="text-white cursor-pointer hover:underline font-bold">
@@ -90,7 +95,9 @@ function Header({ isLoggedIn, isAdmin }) {
                   Produkter
                 </li>
                 <li>
-                  <button className="block px-4 py-2 cursor-pointer hover:underline hover:bg-blue-100 font-bold">
+                  <button
+                    onClick={logoutClick}
+                    className="block px-4 py-2 cursor-pointer hover:underline hover:bg-blue-100 font-bold">
                     Logga ut
                   </button>
                 </li>

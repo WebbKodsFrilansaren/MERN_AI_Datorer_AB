@@ -103,8 +103,10 @@ const loginPOST = async (req, res) => {
             sameSite: "None",
             maxAge: 1000 * 60 * 60 * 24,
           });
+          // if logged in user is "sysadmin" also include a property for that which is true
           return res.status(200).json({
             success: "Inloggad. Välkommen in!",
+            ...(correctUser.username === "sysadmin" ? { isAdmin: true } : null),
             accessToken: accessToken,
           });
         }
