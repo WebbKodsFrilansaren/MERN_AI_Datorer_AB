@@ -5,7 +5,7 @@ import AuthContext from "../middleware/AuthContext";
 import axios from "../middleware/axios";
 
 // Props that can be used to tell "parent" component something happened on our end
-function Login({ setAccessToken, setLoginSuccess, setAdmin }) {
+function Login({ setAccessToken, setLoginSuccess, setAdmin, setAccess }) {
   // Current access_token value when navigating here!
   const { aToken } = useContext(AuthContext);
 
@@ -64,8 +64,9 @@ function Login({ setAccessToken, setLoginSuccess, setAdmin }) {
           }
         );
         if (res.status === 200) {
-          // Tell `App.js` it succeeded logging in and provide accessToken
+          // Tell `App.js` it succeeded logging in and provide accessToken & roles
           setAccessToken(res.data.accessToken);
+          setAccess(res.data.roles);
           setLoginSuccess(true);
           setloggedInSuccess(res.data.success);
           // Also tell if it is admin user

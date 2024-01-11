@@ -104,11 +104,20 @@ const loginPOST = async (req, res) => {
             secure: process.env.NODE_ENV === "production",
             maxAge: 1000 * 60 * 60 * 24,
           });
+
+          // "roles:" will include what access user has PLUS whether account is activated and/or blocked
+          correctUser.roles.push(
+            correctUser.account_activated ? "activated" : ""
+          );
+          correctUser.roles.push(correctUser.account_blocked ? "blocked" : "");
+
           // if logged in user is "sysadmin" also include a property for that which is true
+          // filter out empty string elements from roles array
           return res.status(200).json({
             success: "Inloggad. Välkommen in!",
             ...(correctUser.username === "sysadmin" ? { isAdmin: true } : null),
             accessToken: accessToken,
+            roles: correctUser.roles.filter((role) => role !== ""),
           });
         }
         client.close();

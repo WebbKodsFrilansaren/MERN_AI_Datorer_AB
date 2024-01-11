@@ -11,9 +11,11 @@ import Register from "./router/Register";
 import Start from "./router/Start";
 import NotFound from "./router/NotFound";
 import Products from "./router/Products";
+import Product from "./router/Product";
+import EditProduct from "./router/EditProduct";
 
 // Global components thanks to useContext()
-import AuthContext from "./middleware/AuthContext"; // useContext for:"aToken, setAToken"
+import AuthContext from "./middleware/AuthContext"; // useContext for:"aToken, setAToken, accesses & isAdmin & isLoggedIn"
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false); // Is logged in so menu shows?
@@ -37,6 +39,11 @@ function App() {
     setIsAdmin(bool);
   };
 
+  // Set accesses received after login (Login.js tells us)
+  const setAccess = (accessArr) => {
+    setAccesses(accessArr);
+  };
+
   // RADERA NÄR KLAR:
   useEffect(() => {
     console.log("Värdet för isLoggedin: ", isLoggedIn);
@@ -50,9 +57,14 @@ function App() {
     console.log("Värdet för isAdmin: ", isAdmin);
   }, [isAdmin]);
 
+  useEffect(() => {
+    console.log("Värdet för accesses: ", accesses);
+  }, [accesses]);
+
   // State-based JSX
   return (
-    <AuthContext.Provider value={{ aToken, setAToken }}>
+    <AuthContext.Provider
+      value={{ aToken, setAToken, isAdmin, isLoggedIn, accesses }}>
       <div className="mx-auto">
         <Header
           isLoggedIn={isLoggedIn}
@@ -63,18 +75,33 @@ function App() {
         />
         <main className="mx-auto max-w-screen-xl p-4">
           <Routes>
-            <Route path="/" element={<Start />}></Route>
+            {/* PUBLIC ROUTES = NO ACCESS_TOKEN NEEDED TO USE THEM!! */}
             <Route
               path="/login"
               element={
                 <Login
                   setAccessToken={setAccessToken}
+                  setAccess={setAccess}
                   setLoginSuccess={setLoginSuccess}
                   setAdmin={setAdmin}
                 />
               }></Route>
-            <Route path="/products" element={<Products />}></Route>
             <Route path="/register" element={<Register />}></Route>
+
+            {/* PRIVATE ROUTES = NEED VALID ACCESS_TOKEN OT USE THEM! */}
+            <Route path="/" element={<Start isLoggedIn={isLoggedIn} />}></Route>
+            <Route
+              path="/products"
+              element={<Products isLoggedIn={isLoggedIn} />}></Route>
+            <Route
+              path="/products/:id"
+              element={<Product isLoggedIn={isLoggedIn} />}></Route>
+
+            <Route
+              path="/products/:id/edit"
+              element={<EditProduct isLoggedIn={isLoggedIn} />}></Route>
+
+            {/* CATCH ANY INVALID ROUTE!! */}
             <Route path="/*" element={<NotFound />}></Route>
           </Routes>
         </main>

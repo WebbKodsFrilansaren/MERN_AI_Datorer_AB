@@ -12,9 +12,6 @@ function Header({
   setLoginSuccess,
   setAdmin,
 }) {
-  // Current access_token value when navigating here!
-  const { aToken, setAToken } = useContext(AuthContext);
-
   // Navigate and redirect user with this!
   const navigate = useNavigate();
   // Some initial state that are false because we use fetch() to know what access we have
@@ -22,7 +19,7 @@ function Header({
   const [showMobileMenu, setShowMobileMenu] = useState(false); // Toggle Hamburger Menu when logged in
   const [isModalLogoutOpen, setModalLogoutOpen] = useState(false); // Logout modal
 
-  // Cancel logout modal
+  // Open logout modal
   const logoutClick = () => {
     setModalLogoutOpen(true);
   };

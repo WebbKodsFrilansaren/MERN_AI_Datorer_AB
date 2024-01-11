@@ -1,10 +1,11 @@
 import "../App.css";
 import { useState, useEffect, useContext } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import AuthContext from "../middleware/AuthContext";
 import axios from "../middleware/axios";
+const IMGURL = "http://localhost:5000/images";
 
-function Start() {
+function Start({ isLoggedIn }) {
   // Current access_token value when navigating here!
   const { aToken } = useContext(AuthContext);
 
@@ -13,7 +14,7 @@ function Start() {
 
   // If user is NOT logged in, take them to login page!
   useEffect(() => {
-    if (!aToken.includes("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9")) {
+    if (!isLoggedIn) {
       navigate("/login");
     }
   });
@@ -24,7 +25,7 @@ function Start() {
 
   // Show error when product is not shown
   useEffect(() => {
-    if (latestProduct === null) {
+    if (latestProduct === false) {
       setErrMsgs({ errProduct: "Produkt saknas eller du saknar åtkomst!" });
     } else {
       setErrMsgs({ errProduct: "" });
@@ -41,6 +42,8 @@ function Start() {
       .then((res) => {
         if (res.status === 200) {
           setlatestProduct(res.data.data.at(-1));
+        } else if (res.status === 403) {
+          setlatestProduct(false);
         } else {
           setErrMsgs({
             errProduct:
@@ -50,8 +53,14 @@ function Start() {
       });
   }, []);
 
-  if (!latestProduct) return <div>Provar ladda in senast produkt...</div>;
-
+  if (latestProduct === null)
+    return <div>Provar ladda in senast produkt...</div>;
+  else if (latestProduct === false)
+    return (
+      <p className="text-red-500 font-bold px-4 text-center">
+        Du saknar behörighet att visa enskilda produkter!
+      </p>
+    );
   return (
     <div className="min-h-screen">
       <h1 className="text-4xl font-bold text-center mb-4">
@@ -68,13 +77,19 @@ function Start() {
         <div className="w-fit mx-auto">
           <div className="bg-white rounded-lg p-6 shadow-md mb-4">
             <h2 className="font-bold text-left underline px-4 text-xl hover:underline-offset-4 hover:cursor-pointer hover:text-gray-500">
-              {latestProduct.componentName}
+              <button
+                className="cursor-pointer hover:underline underline"
+                onClick={() =>
+                  navigate(`/products/${latestProduct.componentid}`)
+                }>
+                {latestProduct.componentName}
+              </button>
             </h2>
             {latestProduct.componentImages.length > 0 && (
               <img
                 alt="<Bild saknas eller gick ej att hämta!>"
                 className="block mx-auto h-[333px] mb-2"
-                src={`http://localhost:5000/images/${latestProduct.componentid}/${latestProduct.componentImages[0]}`}
+                src={`${IMGURL}/${latestProduct.componentid}/${latestProduct.componentImages[0]}`}
               />
             )}
             <p className="px-4">
