@@ -3,7 +3,6 @@ import { useState, useEffect, useContext } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import ModalDeleteProduct from "../components/ModalDeleteProduct";
 import AuthContext from "../middleware/AuthContext";
-import axios from "../middleware/axios";
 import useAxiosWithRefresh from "../middleware/axiosWithRefresh";
 const IMGURL = "http://localhost:5000/images";
 
@@ -82,14 +81,13 @@ function Product({ isLoggedIn }) {
     if (singleProduct === false) {
       setErrMsgs({ errProduct: "Produkt saknas eller du saknar åtkomst!" });
     } else {
-      console.log(singleProduct);
       setErrMsgs({ errProduct: "" });
     }
   }, [singleProduct]);
 
   // Fetch single producted after component is mounted
   useEffect(() => {
-    axios
+    axiosWithRefresh
       .get(`/pccomponents/${id}`, {
         validateStatus: () => true,
         headers: { Authorization: `Bearer ${aToken}` },

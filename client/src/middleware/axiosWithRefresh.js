@@ -24,6 +24,7 @@ const useAxiosWithRefresh = () => {
           // Try refresh access_token
           const refreshedToken = await refreshAccessToken();
           // If we succeed we can set new Bearer token and the global `aToken`
+          // using setAToken (its setter)
           config.headers.Authorization = `Bearer ${refreshedToken}`;
           setAToken(refreshedToken);
         } catch (error) {

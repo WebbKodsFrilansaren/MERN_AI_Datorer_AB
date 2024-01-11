@@ -2,10 +2,11 @@ import "../App.css";
 import { useState, useEffect, useContext } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import AuthContext from "../middleware/AuthContext";
-import axios from "../middleware/axios";
+import useAxiosWithRefresh from "../middleware/axiosWithRefresh";
 const IMGURL = "http://localhost:5000/images";
 
 function Start({ isLoggedIn }) {
+  const axiosWithRefresh = useAxiosWithRefresh();
   // Current access_token value when navigating here!
   const { aToken } = useContext(AuthContext);
 
@@ -34,7 +35,7 @@ function Start({ isLoggedIn }) {
 
   // Fetch products but only return first one[0] when component is mounted
   useEffect(() => {
-    axios
+    axiosWithRefresh
       .get("/pccomponents", {
         validateStatus: () => true,
         headers: { Authorization: `Bearer ${aToken}` },
