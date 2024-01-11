@@ -4,10 +4,12 @@ import { useNavigate, useParams } from "react-router-dom";
 import ModalDeleteProduct from "../components/ModalDeleteProduct";
 import AuthContext from "../middleware/AuthContext";
 import axios from "../middleware/axios";
+import useAxiosWithRefresh from "../middleware/axiosWithRefresh";
 const IMGURL = "http://localhost:5000/images";
 
 // First letter always uppercase!
 function Product({ isLoggedIn }) {
+  const axiosWithRefresh = useAxiosWithRefresh();
   // Navigate back to previous page (just like in go back function from VueJS)
   const navigate = useNavigate();
   const goBack = () => {
@@ -15,6 +17,7 @@ function Product({ isLoggedIn }) {
   };
   // Current access_token & roles values when navigating here!
   const { aToken, accesses } = useContext(AuthContext);
+
   // If user is NOT logged in, take them to login page!
   useEffect(() => {
     if (!isLoggedIn) {
@@ -49,7 +52,7 @@ function Product({ isLoggedIn }) {
     try {
       // remove previous message then try delete it
       setErrMsgs({ errDeleteProduct: "" });
-      const res = await axios.delete(`pccomponents/${id}`, {
+      const res = await axiosWithRefresh.delete(`pccomponents/${id}`, {
         validateStatus: () => true,
         headers: { Authorization: `Bearer ${aToken}` },
       });
@@ -205,6 +208,8 @@ function Product({ isLoggedIn }) {
           </button>
         </div>
       </div>
+
+      {/* Modal to delete product and also show error/success msgs! */}
       <ModalDeleteProduct
         isOpen={isModalOpen}
         onCancel={cancelDelete}

@@ -66,6 +66,7 @@ const refreshAToken = async (req, res) => {
         // If successful modifiedCount should be 1
         if (updateRefreshedATokenUser.modifiedCount > 0) {
           // Then close MongoDB & send back new access_token
+          console.log("REFRESH_TOKEN HAR FÖRNYATS!");
           client.close();
           return res.status(200).json({
             success: "Åtkomstförnyelse lyckades!",
@@ -74,7 +75,6 @@ const refreshAToken = async (req, res) => {
         }
       } catch (err) {
         // When failing to update access_token for `user`
-        client.close();
         return res.status(500).json({
           error: "Åtkomstförnyelse misslyckades!",
         });

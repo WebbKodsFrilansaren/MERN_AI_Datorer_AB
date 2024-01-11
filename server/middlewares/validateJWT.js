@@ -66,12 +66,10 @@ const validateAccessToken = async (req, res, next) => {
         return res.status(403).json({ error: "Åtkomst nekad!" });
       }
     } catch (e) {
-      client.close();
       return res.status(500).json({ error: "[VALIDATEJWT] Åtkomst nekad!" });
     }
   } catch (e) {
     // Invalid or expired access token
-    client.close();
     return res.status(500).json({ error: "[VALIDATEJWT] Åtkomst nekad!" });
   }
 };
