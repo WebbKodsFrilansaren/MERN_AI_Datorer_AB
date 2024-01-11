@@ -68,6 +68,7 @@ const getAllPCcomponents = async (req, res) => {
         componentStatus: component.componentStatus,
         componentCategories: component.componentCategories,
         componentImages: includeImgFiles ? component.componentImages : "",
+        componentAdded: component.componentAdded,
       };
     });
 
@@ -151,6 +152,7 @@ const getSinglePCcomponent = async (req, res) => {
       componentImages: includeImgFiles
         ? findSingleComponent.componentImages
         : "",
+      componentAdded: findSingleComponent.componentAdded,
     };
 
     // Finally return the single filtered PC Component!
@@ -264,6 +266,15 @@ const postSinglePCcomponent = async (req, res) => {
     else if (req.files !== undefined && !includeImgFiles) {
       req.files.forEach((file) => fs.unlink(file.path));
     }
+    // Date for component to add
+    const formattedDate = new Date().toLocaleString("sv-SE", {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+    });
 
     // Finalize component to insert in DB
     const postNewComponent = {
@@ -276,6 +287,7 @@ const postSinglePCcomponent = async (req, res) => {
         req.body.componentstatus.toLowerCase() === "true" ? "Ny" : "Begagnad",
       componentCategories: req.body.componentcategories,
       componentImages: includeImgFiles ? imgArray : "",
+      componentAdded: formattedDate,
     };
 
     // Try inserting new component now finally - with or without images!
@@ -349,6 +361,15 @@ const putSinglePCcomponent = async (req, res) => {
         error: `Komponenten med id:${validID} finns inte!`,
       });
     }
+    // Date for component to edit
+    const formattedDate = new Date().toLocaleString("sv-SE", {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+    });
 
     // When it exists, first prepare it
     const updateComponent = {
@@ -358,6 +379,8 @@ const putSinglePCcomponent = async (req, res) => {
       componentAmount: req.body.componentamount,
       componentStatus: req.body.componentstatus ? "Ny" : "Begagnad",
       componentCategories: req.body.componentcategories,
+      componentAdded:
+        findSingleComponent.componentAdded + " (ändrad: " + formattedDate + ")",
     };
 
     // Then, try updating it

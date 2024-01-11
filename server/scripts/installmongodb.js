@@ -610,6 +610,19 @@ async function installMongoDB() {
     userids++;
   });
 
+  // Also add dates to components
+  pccomponentsData.forEach((component) => {
+    const formattedDate = new Date().toLocaleString("sv-SE", {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+    });
+    component.componentAdded = formattedDate;
+  });
+
   // Create new MongoDB client object
   const client = new MongoClient(url);
 

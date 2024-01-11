@@ -10,6 +10,7 @@ import Login from "./router/Login";
 import Register from "./router/Register";
 import Start from "./router/Start";
 import NotFound from "./router/NotFound";
+import Products from "./router/Products";
 
 // Global components thanks to useContext()
 import AuthContext from "./middleware/AuthContext"; // useContext for:"aToken, setAToken"
@@ -72,6 +73,7 @@ function App() {
                   setAdmin={setAdmin}
                 />
               }></Route>
+            <Route path="/products" element={<Products />}></Route>
             <Route path="/register" element={<Register />}></Route>
             <Route path="/*" element={<NotFound />}></Route>
           </Routes>

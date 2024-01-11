@@ -100,11 +100,11 @@ function Header({
             </li>
             {isAdmin && (
               <li className="text-white cursor-pointer hover:underline font-bold">
-                Admin
+                <Link to="/admin">Admin</Link>
               </li>
             )}
             <li className="text-white cursor-pointer hover:underline font-bold">
-              Produkter
+              <Link to="/products">Produkter</Link>
             </li>
             <li>
               <button
@@ -137,11 +137,11 @@ function Header({
                 </li>
                 {isAdmin && (
                   <li className="block px-4 py-2 cursor-pointer hover:underline hover:bg-blue-100 font-bold">
-                    Admin
+                    <Link to="/admin">Admin</Link>
                   </li>
                 )}
                 <li className="block px-4 py-2 cursor-pointer hover:underline hover:bg-blue-100 font-bold">
-                  Produkter
+                  <Link to="/products">Produkter</Link>
                 </li>
                 <li>
                   <button

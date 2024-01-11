@@ -50,14 +50,16 @@ function Start() {
       });
   }, []);
 
-  if (!latestProduct) return <div>Provar ladda in produkt...</div>;
+  if (!latestProduct) return <div>Provar ladda in senast produkt...</div>;
 
   return (
     <div className="min-h-screen">
       <h1 className="text-4xl font-bold text-center mb-4">
         Startsidan av AI Datorer AB Intranät
       </h1>
-      <h2 className="font-bold text-2xl text-center mt-8">Senast produkt</h2>
+      {latestProduct && (
+        <h2 className="font-bold text-2xl text-center mt-8">Senast produkt</h2>
+      )}
       <p className="font-bold text-center text-red-500">
         {errorMsgs.errProduct}
       </p>
@@ -76,7 +78,8 @@ function Start() {
               />
             )}
             <p className="px-4">
-              <span className="font-bold">Tillagd: </span> {}
+              <span className="font-bold">Tillagd: </span>{" "}
+              {latestProduct.componentAdded}
             </p>
             <p className="px-4">
               <span className="font-bold">Kategorier: </span>{" "}
