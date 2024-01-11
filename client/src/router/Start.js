@@ -33,7 +33,7 @@ function Start({ isLoggedIn }) {
     }
   }, [latestProduct]);
 
-  // Fetch products but only return first one[0] when component is mounted
+  // Fetch products but only return last one (at(-1)) when component is mounted
   useEffect(() => {
     axiosWithRefresh
       .get("/pccomponents", {
@@ -59,7 +59,7 @@ function Start({ isLoggedIn }) {
   else if (latestProduct === false)
     return (
       <p className="text-red-500 font-bold px-4 text-center">
-        Du saknar behörighet att visa enskilda produkter!
+        Du saknar behörighet att visa produkter!
       </p>
     );
   return (

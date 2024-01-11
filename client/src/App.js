@@ -96,7 +96,6 @@ function App() {
             <Route
               path="/products/:id"
               element={<Product isLoggedIn={isLoggedIn} />}></Route>
-
             <Route
               path="/products/:id/edit"
               element={<EditProduct isLoggedIn={isLoggedIn} />}></Route>

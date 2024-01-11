@@ -117,6 +117,12 @@ function Product({ isLoggedIn }) {
         </button>
       </div>
     );
+  else if (singleProduct === false)
+    return (
+      <p className="text-red-500 font-bold px-4 text-center">
+        Du saknar behörighet att visa enskilda produkter!
+      </p>
+    );
 
   // When no access to it
   if (!accesses.includes("get_components")) {
