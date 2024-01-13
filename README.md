@@ -17,7 +17,7 @@
 
 4. Skriv sen i samma Terminal `npm run generatetokens` för att generera en "access token" och en "refresh token" som bör klistras in i `.env`-filen (den som döpts om från `.envTEMPLATE`-filen). _VIKTIGT:_ Dessa MÅSTE klistras in annars kan det "krångla".
 
-5. Skriv i Terminal i klonade huvudmappen:`npm run installimages` för att återställa/kopiera nya bilder från backup-mappen (sker på serversidan). Dessa hamnar då i `/server/images/components`.
+5. Skriv i Terminal i klonade huvudmappen:`npm run installimages` för att återställa/kopiera nya bilder från backup-mappen (sker på serversidan). Dessa hamnar då i `/server/images/{componentid}`.
 
 6. Skriv i Terminal i klonade huvudmappen:`npm run installmongodb` för att återställa/skapa testdata i MongoDB-databasen (sker på serversidan). Databasen heter då:`maka2207` och deras kollektioner:`pccomponents` (för datorkomponenter + bilder), `users` (användare + deras tokens), `blacklists` (blockerade användare via IP-adresser).
 
@@ -31,4 +31,36 @@
 
 Alla REST API endpoints följer formatet `localhost:5000/api/{CRUD endpoint}`.
 
-Mer uppdateras snart.
+### Components
+
+#### GET - Components
+
+- GET `localhost:5000/api/pccomponents/` - Hämta alla komponenter
+
+- GET `localhost:5000/api/pccomponents/{id}` - Hämta komponent med componentid {id}
+
+#### POST - Components
+
+- POST `localhost:5000/api/pccomponents/` - Lägg till ny komponent
+
+#### PUT - Components
+
+- PUT `localhost:5000/api/pccomponents/{id}` - Ändra komponent med componentid {id} (bilder ändras separat men på samma UI-sida)
+
+- PUT `localhost:5000/api/pccomponents/{id}/images/{img_id}` - Ändra bild med {img_id} i komponent med componentid {id}
+
+#### DELETE - Components
+
+- DELETE `localhost:5000/api/pccomponents/{id}` - Radera komponent med componentid {id} (dess bildmapp med alla bilder raderas också)
+
+- DELETE `localhost:5000/api/pccomponents/{id}/images/{img_id}` - Radera bild med {img_id} i komponent med componentid {id}
+
+### Users
+
+#### GET - Users
+
+#### POST - Users
+
+#### PUT - Users
+
+#### DELETE - Users

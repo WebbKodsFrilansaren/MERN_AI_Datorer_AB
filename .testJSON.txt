@@ -1,0 +1,47 @@
+// POST New User As a Test
+{
+    "username": "TestAnvändare1337",
+    "email": "testar@test.se",
+    "fullname": "Herr Blå",
+    "password": "!superDuperAdmin1337!",
+    "account_activated": true,
+    "account_blocked": false,
+    "can_get_images": true,
+    "can_get_components": true,
+    "can_put_images": false,
+    "can_put_components": false,
+    "can_post_images": false,
+    "can_post_components": false,
+    "can_delete_images": false,
+    "can_delete_components": false
+}
+
+// PUT that same user /users/
+{
+    "username": "TestAnvändare42069",
+    "email": "testar@test.se",
+    "fullname": "Herr Blå",
+    "password": "",
+    "account_activated": true,
+    "account_blocked": false,
+    "can_get_images": true,
+    "can_get_components": true,
+    "can_put_images": false,
+    "can_put_components": false,
+    "can_post_images": false,
+    "can_post_components": false,
+    "can_delete_images": false,
+    "can_delete_components": false
+}
+
+// POST Component http://localhost:5000/api/pccomponents
+// PUT Component http://localhost:5000/api/pccomponents/2
+// Use same JSON Data below:
+{
+    "componentname": "Bärbar laddare",
+    "componentdescription": "En bärbar laddare som kan bäras med överallt och ladda när du än behöver den!",
+    "componentprice": 1,
+    "componentamount": 0,
+    "componentstatus": true,
+    "componentcategories": ["Tillbehör"]
+}

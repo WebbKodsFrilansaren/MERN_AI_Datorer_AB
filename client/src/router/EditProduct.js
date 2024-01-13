@@ -515,12 +515,16 @@ function EditProduct({ isLoggedIn }) {
             ))}
           </div>
         )}
+        <p className="text-gray-950 font-bold mb-3 italic">
+          Vänsterklick = Radera bild UTAN bekräftelse
+          <br /> Högerklick = Byta bild (ladda upp)
+        </p>
         {accesses.includes("post_images") && (
           <>
             <label
               htmlFor="filesID"
               className="block w-fit hover:cursor-pointer hover:bg-blue-700 bg-blue-500 p-3 rounded-lg mb-4 text-white font-bold">
-              + Ny bild
+              + BILD
             </label>
             <input
               onChange={handleImgUpload}
@@ -540,7 +544,7 @@ function EditProduct({ isLoggedIn }) {
           <label
             htmlFor="componentadded"
             className="block text-sm font-bold text-gray-600 mb-2">
-            Tillagd: {editBody.componentadded}
+            Tillagd/ändrad: {editBody.componentadded}
           </label>
           <label
             htmlFor="componentname"
