@@ -76,9 +76,14 @@ function Start({ isLoggedIn }) {
     );
   return (
     <div className="min-h-screen">
-      <h1 className="text-4xl font-bold text-center mb-4">
+      <h1 className="text-4xl font-bold text-center mb-8">
         Startsidan av AI Datorer AB Intranät
       </h1>
+      {accesses.includes("post_components") && (
+        <button className="bg-green-500 block hover:bg-green-600 text-white w-fit font-bold py-2 px-4 mx-auto rounded">
+          <Link to="/products/add">+ Lägg till produkt</Link>
+        </button>
+      )}
       {latestProduct && (
         <h2 className="font-bold text-2xl text-center mt-8">Senast produkt</h2>
       )}
@@ -91,7 +96,7 @@ function Start({ isLoggedIn }) {
           <div className="bg-white rounded-lg p-6 shadow-md mb-4">
             <h2 className="font-bold text-left underline px-4 text-xl hover:underline-offset-4 hover:cursor-pointer hover:text-gray-500">
               <button
-                className="cursor-pointer hover:underline underline"
+                className="cursor-pointer hover:underline underline mb-4"
                 onClick={() =>
                   navigate(`/products/${latestProduct.componentid}`)
                 }>

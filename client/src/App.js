@@ -13,6 +13,7 @@ import NotFound from "./router/NotFound";
 import Products from "./router/Products";
 import Product from "./router/Product";
 import EditProduct from "./router/EditProduct";
+import AddProduct from "./router/AddProduct";
 
 // Global components thanks to useContext()
 import AuthContext from "./middleware/AuthContext"; // useContext for:"aToken, setAToken, accesses & isAdmin & isLoggedIn"
@@ -108,6 +109,9 @@ function App() {
             <Route
               path="/products/:id/edit"
               element={<EditProduct isLoggedIn={isLoggedIn} />}></Route>
+            <Route
+              path="/products/add"
+              element={<AddProduct isLoggedIn={isLoggedIn} />}></Route>
 
             {/* CATCH ANY INVALID ROUTE!! */}
             <Route path="/*" element={<NotFound />}></Route>

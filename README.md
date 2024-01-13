@@ -29,7 +29,7 @@
 
 ## ENDPOINTS
 
-Alla REST API endpoints följer formatet `localhost:5000/api/{CRUD endpoint}`.
+Alla REST API endpoints följer formatet `localhost:5000/api/{CRUD endpoint}`. Dessa går att använda direkt i ThunderClient/POSTMAN och/eller så används de på samma sätt inuti ReactJS-klienten.
 
 ### Components
 

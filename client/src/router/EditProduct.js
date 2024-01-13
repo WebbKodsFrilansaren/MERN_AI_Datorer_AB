@@ -515,6 +515,7 @@ function EditProduct({ isLoggedIn }) {
             ))}
           </div>
         )}
+
         <p className="text-gray-950 font-bold mb-3 italic">
           Vänsterklick = Radera bild UTAN bekräftelse
           <br /> Högerklick = Byta bild (ladda upp)
@@ -650,25 +651,25 @@ function EditProduct({ isLoggedIn }) {
         <p className="text-green-500 text-center lg:text-left font-bold">
           {msg.successdelete}
         </p>
-        <div className="flex justify-between">
+        <div className="flex justify-center">
           {accesses.includes("put_components") && (
             <button
               onClick={saveProductClick}
               type="submit"
-              className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg mr-2">
+              className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg mr-4">
               Spara
             </button>
           )}
           {accesses.includes("delete_components") && (
             <button
               onClick={deleteClick}
-              className="bg-red-800 hover:bg-red-500 text-white font-semibold p-2 m-1 rounded-lg">
+              className="bg-red-800 hover:bg-red-500 text-white font-bold py-2 px-4 rounded-lg mr-4">
               Radera
             </button>
           )}
           <button
             onClick={goBack}
-            className="block bg-black hover:bg-gray-500 text-white font-semibold p-2 m-1 rounded-lg">
+            className="block bg-black hover:bg-gray-500 text-white font-bold py-2 px-4 rounded-lg mr-6">
             Tillbaka
           </button>
         </div>
