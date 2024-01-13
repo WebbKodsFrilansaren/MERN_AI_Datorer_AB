@@ -924,11 +924,16 @@ const putSinglePCcomponentImage = async (req, res, next) => {
       .json({ error: "Skicka med bilden du vill uppdatera med!" });
   }
   if (!req.file.mimetype.includes("image")) {
-    fs.unlink(req.file.path); // Remove invalid file
+    fs.unlink(req.file.path, (err) => {
+      if (err) {
+        console.error("Error deleting invalid file:", err);
+      }
+    });
     return res
       .status(422)
       .json({ error: "Skicka en bildfil du vill uppdatera med!" });
   }
+
   // ALL OK!
   next();
 };
@@ -996,7 +1001,12 @@ const postSinglePccomponentImage = async (req, res, next) => {
       .json({ error: "Skicka med bilden du vill lägga till!" });
   }
   if (!req.file.mimetype.includes("image")) {
-    fs.unlink(req.file.path); // Remove invalid file
+    fs.unlink(req.file.path, (err) => {
+      if (err) {
+        console.error("Error deleting invalid file:", err);
+      }
+    }); // Remove invalid file
+
     return res
       .status(422)
       .json({ error: "Skicka en bildfil du vill lägga til!" });

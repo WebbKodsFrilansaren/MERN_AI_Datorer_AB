@@ -649,6 +649,12 @@ const postSinglePCcomponentImage = async (req, res) => {
     }
 
     // Push now it to array which is either empty or has all current images!
+    const latestImg =
+      fileNameWithOutDot +
+      "-" +
+      counter +
+      req.file.originalname.slice(lastDotInFileName);
+
     imgArray.push(
       fileNameWithOutDot +
         "-" +
@@ -687,11 +693,13 @@ const postSinglePCcomponentImage = async (req, res) => {
     );
 
     // if = succeeded inserting new component | else = failed trying it
+    // "latestImg" is the latest added so it can be updated in ReactJS client
     if (tryPostSingleImage) {
       client.close();
-      return res
-        .status(200)
-        .json({ success: "En bild till komponenten har laddats upp" });
+      return res.status(200).json({
+        success: "En bild till komponenten har laddats upp",
+        data: latestImg,
+      });
     } else {
       fs.unlink(req.file.path);
       client.close();

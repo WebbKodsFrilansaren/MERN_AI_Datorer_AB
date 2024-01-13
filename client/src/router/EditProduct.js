@@ -73,6 +73,46 @@ function EditProduct({ isLoggedIn }) {
   // State for image handling!
   const [images, setImages] = useState(editBody.componentimages);
 
+  // Upload single image
+  // When image is uploaded just upload it ASAP and tell if successful or not!
+  const handleImgUpload = (e) => {
+    const file = e.target.files[0];
+    uploadSingleImage(file);
+  };
+  const uploadSingleImage = async (file) => {
+    try {
+      const formData = new FormData();
+      formData.append("componentimages", file);
+
+      const res = await axiosWithRefresh.post(
+        `/pccomponents/${id}/images`,
+        formData,
+        {
+          validateStatus: () => true,
+          headers: { Authorization: `Bearer ${aToken}` },
+        }
+      );
+      if (res.status === 200) {
+        setMsgs({
+          successimage: "En bild har laddats upp till komponenten!",
+        });
+        setImages((imgs) => [...imgs, res.data.data]);
+        setTimeout(() => {
+          setMsgs({ successimage: "" });
+        }, 2000);
+      } else {
+        setMsgs({
+          errorimage:
+            res.data?.error || "Bilden misslyckades tas bort ur databas!",
+        });
+      }
+    } catch (err) {
+      setMsgs({
+        errorimage: "Kontakta Webbutvecklare. Bugg!",
+      });
+    }
+  };
+
   // Fetch single producted after component is mounted
   useEffect(() => {
     axiosWithRefresh
@@ -380,9 +420,9 @@ function EditProduct({ isLoggedIn }) {
       <h1 className="text-2xl font-bold mb-4">
         Redigera {editBody?.componentName}
       </h1>
-      <div className="flex mb-4">
+      <div className="">
         {images.length > 0 && (
-          <div>
+          <div className="flex mb-4">
             {images.map((image, i) => (
               <Image
                 onDeleteImage={onDeleteImage}
@@ -398,15 +438,16 @@ function EditProduct({ isLoggedIn }) {
           <>
             <label
               htmlFor="filesID"
-              className="hover:cursor-pointer hover:bg-blue-700 bg-blue-500 p-2 rounded-lg text-white font-bold">
+              className="block w-fit hover:cursor-pointer hover:bg-blue-700 bg-blue-500 p-3 rounded-lg mb-4 text-white font-bold">
               + Ny bild
             </label>
             <input
+              onChange={handleImgUpload}
               id="filesID"
-              accept="images/*"
+              accept="image/*"
               name="images"
               type="file"
-              class="hidden"
+              className="hidden"
             />
           </>
         )}

@@ -105,7 +105,7 @@ function Start({ isLoggedIn }) {
                 src={`${IMGURL}/${latestProduct.componentid}/${latestProduct.componentImages[0]}`}
               />
             )}
-            <p className="px-4">
+            <p className="px-4 mb-3">
               <span className="font-bold">Tillagd/ändrad: </span>{" "}
               {latestProduct.componentAdded}
             </p>

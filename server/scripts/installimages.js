@@ -10,7 +10,7 @@ const copyFileAsync = promisify(fs.copyFile);
 
 // Where from and where to copying backup images
 const sourceDirectory = "server/images/backup";
-const destinationDirectory = "server/images/components";
+const destinationDirectory = "server/images/";
 
 // Recursive function that will go inside each folder and sub-folder to copy each file from within it/them!
 async function copyFilesRecursively(source, destination) {
