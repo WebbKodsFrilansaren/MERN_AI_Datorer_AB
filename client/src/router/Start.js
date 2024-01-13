@@ -1,6 +1,6 @@
 import "../App.css";
 import { useState, useEffect, useContext } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import AuthContext from "../middleware/AuthContext";
 import useAxiosWithRefresh from "../middleware/axiosWithRefresh";
 const IMGURL = "http://localhost:5000/images";
@@ -106,7 +106,7 @@ function Start({ isLoggedIn }) {
               />
             )}
             <p className="px-4">
-              <span className="font-bold">Tillagd: </span>{" "}
+              <span className="font-bold">Tillagd/ändrad: </span>{" "}
               {latestProduct.componentAdded}
             </p>
             <p className="px-4">

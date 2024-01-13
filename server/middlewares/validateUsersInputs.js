@@ -369,6 +369,20 @@ const postSingleUser = async (req, res, next) => {
   next();
 };
 
+const getSingleUser = async (req, res, next) => {
+  // Check /:id param is valid integer!
+  const isInteger = /^[0-9]+$/.test(req.params?.id);
+  if (
+    !req.params?.id ||
+    typeof req.params?.id !== "string" ||
+    isNaN(req.params?.id) ||
+    !isInteger
+  ) {
+    return res.status(422).json({ error: "Ange ett heltal!" });
+  }
+  next();
+};
+
 // For PUT /api/users/:id
 const putSingleUser = async (req, res, next) => {
   // Check /:id param is valid integer!
@@ -997,6 +1011,7 @@ module.exports = {
   getSinglePccomponent,
   postSinglePccomponent,
   postSingleUser,
+  getSingleUser,
   putSinglePccomponent,
   putSingleUser,
   deleteSinglePccomponent,

@@ -6,6 +6,22 @@ import ModalDeleteProduct from "../components/ModalDeleteProduct";
 import useAxiosWithRefresh from "../middleware/axiosWithRefresh";
 const IMGURL = "http://localhost:5000/images";
 
+// Each picture component which uses array index of images to delete it
+function Image({ image, id, onDeleteImage, index }) {
+  const onImgClickDelete = async (e) => {
+    onDeleteImage(id, index);
+  };
+  return (
+    <img
+      title="VÄNSTERKLICKA FÖR ATT RADERA DIREKT FRÅN DATABAS!"
+      onClick={onImgClickDelete}
+      alt={image.slice(0, image.lastIndexOf("."))}
+      className="mx-4 cursor-pointer w-32 h-32 object-cover hover:opacity-50 hover:bg-opacity-50 hover:bg-red-500"
+      src={`${IMGURL}/${id}/${image}`}
+    />
+  );
+}
+
 // First letter always uppercase!
 function EditProduct({ isLoggedIn }) {
   // Navigate back to previous page (just like in go back function from VueJS)
@@ -30,6 +46,8 @@ function EditProduct({ isLoggedIn }) {
   const [singleProductToEdit, setSingleProductToEdit] = useState(null);
   const [msg, setMsgs] = useState({
     errorupdate: "",
+    errorimage: "",
+    successimage: "",
     errordelete: "",
     successdelete: "",
     successupdate: "",
@@ -50,8 +68,10 @@ function EditProduct({ isLoggedIn }) {
     componentstatus: "",
     componentimages: "",
   });
-  const [images, setImages] = useState({});
   const [isModalOpen, setModalOpen] = useState(false); // Delete modal
+
+  // State for image handling!
+  const [images, setImages] = useState(editBody.componentimages);
 
   // Fetch single producted after component is mounted
   useEffect(() => {
@@ -70,7 +90,7 @@ function EditProduct({ isLoggedIn }) {
             componentdescription: res.data.data.componentDescription,
             componentamount: res.data.data.componentAmount,
             componentprice: res.data.data.componentPrice,
-            componentcategories: res.data.data.componentCategories.join(", "),
+            componentcategories: res.data.data.componentCategories.join(","),
             componentstatus: res.data.data.componentStatus,
             componentimages: res.data.data.componentImages,
           });
@@ -85,11 +105,44 @@ function EditProduct({ isLoggedIn }) {
       });
   }, []);
 
+  // Get images and set their state after fetching all data
+  useEffect(() => {
+    setImages(editBody.componentimages);
+  }, [editBody.componentimages]);
+
+  const onDeleteImage = async (id, index) => {
+    //confirm("RADERA BILD FRÅN DATABAS? KAN EJ ÅNGRAS!!!");
+    const res = await axiosWithRefresh.delete(
+      `/pccomponents/${id}/images/${index}`,
+      {
+        validateStatus: () => true,
+        headers: { Authorization: `Bearer ${aToken}` },
+      }
+    );
+
+    // If image was removed!
+    if (res.status === 200) {
+      // Update state after successful image delete
+      setImages((prev) => prev.filter((_, i) => i !== index));
+      setMsgs({ successimage: "Bild borttagen från databas för komponenten!" });
+      setTimeout(() => {
+        setMsgs({ successimage: "" });
+      }, 3333);
+    } else {
+      setMsgs({
+        errorimage:
+          res.data?.error || "Bilden misslyckades tas bort ur databas!",
+      });
+    }
+  };
+
   const saveProductClick = async (e) => {
     // Prevent default submit & remove all visible msgs!
     e.preventDefault();
     setMsgs((prev) => {
       return {
+        errorimage: "",
+        successimage: "",
         errorupdate: "",
         errordelete: "",
         successdelete: "",
@@ -141,6 +194,22 @@ function EditProduct({ isLoggedIn }) {
         };
       });
     }
+    // Check correct category splitting
+    if (
+      editBody.componentcategories !== "" &&
+      (editBody.componentcategories.includes(" ") ||
+        editBody.componentcategories.includes(", "))
+    ) {
+      setMsgs((prev) => {
+        return {
+          ...prev,
+          errcomponentcategories:
+            "Separera endast med ',' per kategori och inget mellanslag eller annat!",
+        };
+      });
+      return;
+    }
+
     // Only PUT request when ALL fields are NOT empty!
     if (
       editBody.componentname !== "" &&
@@ -150,6 +219,52 @@ function EditProduct({ isLoggedIn }) {
       editBody.componentcategories !== "" &&
       editBody.componentstatus !== ""
     ) {
+      // ALL OK HERE SO PREPARE PUT REQUEST!
+      try {
+        // Turn categories to an array even if it is a single one!
+        let categories;
+        if (editBody.componentcategories.includes(",")) {
+          categories = editBody.componentcategories.split(",");
+        } else {
+          categories = [editBody.componentcategories];
+        }
+
+        const putReq = {
+          componentname: editBody.componentname,
+          componentdescription: editBody.componentdescription,
+          componentprice: editBody.componentprice,
+          componentamount: editBody.componentamount,
+          componentcategories: categories,
+          componentstatus: editBody.componentstatus === "Ny" ? true : false,
+        };
+        const res = await axiosWithRefresh.put(`/pccomponents/${id}`, putReq, {
+          validateStatus: () => true,
+          headers: { Authorization: `Bearer ${aToken}` },
+        });
+        // When success updating product
+        if (res.status === 200) {
+          setMsgs({ successupdate: res.data.success });
+          setTimeout(() => {
+            setMsgs({ successupdate: "" });
+          }, 3333);
+          setEditBody((prev) => {
+            return {
+              ...prev,
+              componentName: editBody.componentname,
+            };
+          });
+        } // Show error message in 3,3 seconds
+        else {
+          setMsgs({
+            errorupdate:
+              res.data?.error || "Misslyckades att uppdatera komponenten!",
+          });
+        }
+      } catch (err) {
+        setMsgs({
+          errorupdate: "Kontakta Webbutvecklaren för klienthjälp. Bugg!",
+        });
+      }
     }
   };
 
@@ -266,24 +381,38 @@ function EditProduct({ isLoggedIn }) {
         Redigera {editBody?.componentName}
       </h1>
       <div className="flex mb-4">
-        {editBody.componentimages.length > 0 && (
+        {images.length > 0 && (
           <div>
-            {editBody.componentimages.map((image, i) => (
-              <img
+            {images.map((image, i) => (
+              <Image
+                onDeleteImage={onDeleteImage}
                 key={i}
-                alt={image.slice(0, image.lastIndexOf("."))}
-                className="mx-4 cursor-pointer w-32 h-32 object-cover hover:opacity-50"
-                src={`${IMGURL}/${id}/${image}`}
+                image={image}
+                id={id}
+                index={i}
               />
             ))}
           </div>
         )}
         {accesses.includes("post_images") && (
-          <button className="bg-blue-500 hover:bg-blue-700 text-white font-extrabold py-2 px-4 rounded">
-            + Ny bild
-          </button>
+          <>
+            <label
+              htmlFor="filesID"
+              className="hover:cursor-pointer hover:bg-blue-700 bg-blue-500 p-2 rounded-lg text-white font-bold">
+              + Ny bild
+            </label>
+            <input
+              id="filesID"
+              accept="images/*"
+              name="images"
+              type="file"
+              class="hidden"
+            />
+          </>
         )}
       </div>
+      <p className="text-green-500 font-bold mb-3">{msg.successimage}</p>
+      <p className="text-red-500 font-bold mb-3">{msg.errorimage}</p>
       <form className="space-y-4">
         <div>
           <label
@@ -356,7 +485,7 @@ function EditProduct({ isLoggedIn }) {
           <label
             htmlFor="componentcategories"
             className="block text-sm font-bold text-gray-600">
-            Kategorier (separera med komma):
+            Kategorier (separera endast med ett komma &amp; per kategori):
           </label>
           <input
             onChange={prepareEditBody}
@@ -383,6 +512,12 @@ function EditProduct({ isLoggedIn }) {
           </select>
           <p className="text-red-500 font-bold">{msg.errcomponentstatus}</p>
         </div>
+        <p className="text-red-500 text-center lg:text-left font-bold">
+          {msg.errorupdate}
+        </p>
+        <p className="text-green-500 text-center lg:text-left font-bold">
+          {msg.successupdate}
+        </p>
         <p className="text-red-500 text-center lg:text-left font-bold">
           {msg.errordelete}
         </p>

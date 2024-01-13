@@ -139,6 +139,10 @@ function Product({ isLoggedIn }) {
       <h1 className="text-center text-3xl font-bold mb-8">
         {singleProduct.componentName}
       </h1>
+      <p className="px-4 mb-3">
+        <span className="font-bold">Tillagd/ändrad:</span>{" "}
+        {singleProduct.componentAdded}
+      </p>
       <p className="px-4">
         <span className="font-bold">Beskrivning:</span>{" "}
         {singleProduct.componentDescription}

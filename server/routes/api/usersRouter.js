@@ -13,6 +13,7 @@ router
   .post(validateFormInput.postSingleUser, crudUsers.postSingleUser); // GET + POST
 router // PUT/:id, DELETE/:id
   .route("/:id")
+  .get(validateFormInput.getSingleUser, crudUsers.getSingleUser)
   .put(validateFormInput.putSingleUser, crudUsers.putSingleUser)
   .delete(validateFormInput.deleteSingleUser, crudUsers.deleteSingleUser);
 

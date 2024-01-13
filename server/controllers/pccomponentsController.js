@@ -379,8 +379,7 @@ const putSinglePCcomponent = async (req, res) => {
       componentAmount: req.body.componentamount,
       componentStatus: req.body.componentstatus ? "Ny" : "Begagnad",
       componentCategories: req.body.componentcategories,
-      componentAdded:
-        findSingleComponent.componentAdded + " (ändrad: " + formattedDate + ")",
+      componentAdded: formattedDate,
     };
 
     // Then, try updating it
