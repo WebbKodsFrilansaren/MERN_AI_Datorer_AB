@@ -39,7 +39,7 @@ function EditProduct({ isLoggedIn }) {
     errcomponentcategories: "",
     errcomponentprice: "",
     errcomponentamount: "",
-    errcomponentstatus: "false",
+    errcomponentstatus: "",
   });
   const [editBody, setEditBody] = useState({
     componentname: "",
@@ -47,7 +47,7 @@ function EditProduct({ isLoggedIn }) {
     componentcategories: "",
     componentprice: 0,
     componentamount: 0,
-    componentstatus: false,
+    componentstatus: "",
     componentimages: "",
   });
   const [images, setImages] = useState({});
@@ -70,7 +70,7 @@ function EditProduct({ isLoggedIn }) {
             componentdescription: res.data.data.componentDescription,
             componentamount: res.data.data.componentAmount,
             componentprice: res.data.data.componentPrice,
-            componentcategories: res.data.data.componentCategories,
+            componentcategories: res.data.data.componentCategories.join(", "),
             componentstatus: res.data.data.componentStatus,
             componentimages: res.data.data.componentImages,
           });
@@ -84,6 +84,74 @@ function EditProduct({ isLoggedIn }) {
         }
       });
   }, []);
+
+  const saveProductClick = async (e) => {
+    // Prevent default submit & remove all visible msgs!
+    e.preventDefault();
+    setMsgs((prev) => {
+      return {
+        errorupdate: "",
+        errordelete: "",
+        successdelete: "",
+        successupdate: "",
+        errorfetch: "",
+        errcomponentname: "",
+        errcomponentdescription: "",
+        errcomponentcategories: "",
+        errcomponentprice: "",
+        errcomponentamount: "",
+        errcomponentstatus: "",
+      };
+    });
+    // Then check fields are not empty
+    if (editBody.componentname === "") {
+      setMsgs((prev) => {
+        return { ...prev, errcomponentname: "Ange ett namn för komponenten!" };
+      });
+    }
+    if (editBody.componentdescription === "") {
+      setMsgs((prev) => {
+        return {
+          ...prev,
+          errcomponentdescription: "Ange en beskrivning för komponenten!",
+        };
+      });
+    }
+    if (editBody.componentprice === "") {
+      setMsgs((prev) => {
+        return {
+          ...prev,
+          errcomponentprice: "Ange ett pris för komponenten!",
+        };
+      });
+    }
+    if (editBody.componentamount === "") {
+      setMsgs((prev) => {
+        return {
+          ...prev,
+          errcomponentamount: "Ange ett antal för komponenten!",
+        };
+      });
+    }
+    if (editBody.componentcategories === "") {
+      setMsgs((prev) => {
+        return {
+          ...prev,
+          errcomponentcategories: "Ange färst en kategori för komponenten!",
+        };
+      });
+    }
+    // Only PUT request when ALL fields are NOT empty!
+    if (
+      editBody.componentname !== "" &&
+      editBody.componentdescription !== "" &&
+      editBody.componentprice !== "" &&
+      editBody.componentamount !== "" &&
+      editBody.componentcategories !== "" &&
+      editBody.componentstatus !== ""
+    ) {
+    }
+  };
 
   // Open delete modal
   const deleteClick = () => {
@@ -148,7 +216,7 @@ function EditProduct({ isLoggedIn }) {
   if (!accesses.includes("put_components")) {
     return (
       <>
-        <p class="text-center text-red-500 font-extrabold text-sm">
+        <p className="text-center text-red-500 font-extrabold text-sm">
           Du saknar åtkomst att uppdatera komponenter!
         </p>
         <button
@@ -166,7 +234,7 @@ function EditProduct({ isLoggedIn }) {
   else if (singleProductToEdit === false) {
     return (
       <>
-        <p class="text-center text-red-500 font-extrabold text-sm">
+        <p className="text-center text-red-500 font-extrabold text-sm">
           Produkten med id:{id} finns inte!
         </p>
         <button
@@ -177,14 +245,27 @@ function EditProduct({ isLoggedIn }) {
       </>
     );
   }
+  // Failed fetching
+  if (msg.errorfetch !== "") {
+    <>
+      <p className="text-center text-red-500 font-extrabold text-sm">
+        {msg.errorfetch}
+      </p>
+      <button
+        onClick={goBack}
+        className="block bg-black hover:bg-gray-500 text-white font-semibold p-2 m-1 rounded-lg">
+        Tillbaka
+      </button>
+    </>;
+  }
 
   // If allowed to edit product and it exist
   return (
-    <div class="p-8 min-h-screen">
-      <h1 class="text-2xl font-bold mb-4">
-        Redigera {editBody?.componentname}
+    <div className="p-8 min-h-screen">
+      <h1 className="text-2xl font-bold mb-4">
+        Redigera {editBody?.componentName}
       </h1>
-      <div class="flex mb-4">
+      <div className="flex mb-4">
         {editBody.componentimages.length > 0 && (
           <div>
             {editBody.componentimages.map((image, i) => (
@@ -198,21 +279,21 @@ function EditProduct({ isLoggedIn }) {
           </div>
         )}
         {accesses.includes("post_images") && (
-          <button class="bg-blue-500 hover:bg-blue-700 text-white font-extrabold py-2 px-4 rounded">
+          <button className="bg-blue-500 hover:bg-blue-700 text-white font-extrabold py-2 px-4 rounded">
             + Ny bild
           </button>
         )}
       </div>
-      <form class="space-y-4">
+      <form className="space-y-4">
         <div>
           <label
             htmlFor="componentadded"
-            class="block text-sm font-bold text-gray-600 mb-2">
+            className="block text-sm font-bold text-gray-600 mb-2">
             Tillagd: {editBody.componentadded}
           </label>
           <label
             htmlFor="componentname"
-            class="block text-sm font-bold text-gray-600">
+            className="block text-sm font-bold text-gray-600">
             Namn:
           </label>
           <input
@@ -227,7 +308,7 @@ function EditProduct({ isLoggedIn }) {
         <div>
           <label
             htmlFor="componentdescription"
-            class="block text-sm font-bold text-gray-600">
+            className="block text-sm font-bold text-gray-600">
             Beskrivning:
           </label>
           <textarea
@@ -244,7 +325,7 @@ function EditProduct({ isLoggedIn }) {
         <div>
           <label
             htmlFor="componentprice"
-            class="block text-sm font-bold text-gray-600">
+            className="block text-sm font-bold text-gray-600">
             Pris (kr):
           </label>
           <input
@@ -256,10 +337,10 @@ function EditProduct({ isLoggedIn }) {
           />
           <p className="text-red-500 font-bold">{msg.errcomponentprice}</p>
         </div>
-        <div className="inline-block">
+        <div>
           <label
             htmlFor="componentamount"
-            class="block text-sm font-bold text-gray-600">
+            className="block text-sm font-bold text-gray-600">
             Antal (st):
           </label>
           <input
@@ -274,7 +355,7 @@ function EditProduct({ isLoggedIn }) {
         <div>
           <label
             htmlFor="componentcategories"
-            class="block text-sm font-bold text-gray-600">
+            className="block text-sm font-bold text-gray-600">
             Kategorier (separera med komma):
           </label>
           <input
@@ -282,18 +363,38 @@ function EditProduct({ isLoggedIn }) {
             type="text"
             id="componentcategories"
             className="mt-1 p-2 w-full border rounded-md"
-            value={editBody.componentcategories.join(", ")}
+            value={editBody.componentcategories}
           />
           <p className="text-red-500 font-bold">{msg.errcomponentcategories}</p>
         </div>
-        <p class="text-green-500 text-center lg:text-left font-bold">
+        <div>
+          <label
+            htmlFor="componentstatus"
+            className="block text-sm font-bold text-gray-600">
+            Skick:
+          </label>
+          <select
+            onChange={prepareEditBody}
+            type="text"
+            id="componentstatus"
+            className="mt-1 p-2 w-40 border rounded-md">
+            <option value="Ny">Ny</option>
+            <option value="Begagnad">Begagnad</option>
+          </select>
+          <p className="text-red-500 font-bold">{msg.errcomponentstatus}</p>
+        </div>
+        <p className="text-red-500 text-center lg:text-left font-bold">
+          {msg.errordelete}
+        </p>
+        <p className="text-green-500 text-center lg:text-left font-bold">
           {msg.successdelete}
         </p>
-        <div class="flex justify-between">
+        <div className="flex justify-between">
           {accesses.includes("put_components") && (
             <button
+              onClick={saveProductClick}
               type="submit"
-              class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg mr-2">
+              className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg mr-2">
               Spara
             </button>
           )}
