@@ -4,21 +4,38 @@ import { useNavigate } from "react-router-dom";
 import AuthContext from "../middleware/AuthContext";
 import useAxiosWithRefresh from "../middleware/axiosWithRefresh";
 
-function UploadImg({ uploadImages, index, onDeleteImage }) {
+function UploadImg({
+  uploadImages,
+  index,
+  onDeleteImage,
+  updateSelectedImg,
+  onUpdateImg,
+}) {
   // Delete selected image
   const onImgClickDelete = async () => {
     onDeleteImage(index);
   };
+  // Send chosen image file when right-clicked on image to update that single image
+  const handleChangeImg = (e) => {
+    const selectedFile = e.target.files[0];
+    updateSelectedImg(selectedFile, index);
+  };
   return (
     <>
       <img
-        title="VÄNSTERKLICKA FÖR ATT RADERA DIREKT FRÅN DATABAS!"
         onClick={onImgClickDelete}
+        onContextMenu={onUpdateImg}
         alt="Uppladdad bild"
-        className="mx-4 cursor-pointer w-32 h-32 object-cover hover:opacity-50 hover:bg-opacity-50 hover:bg-red-500"
+        className="m-1 cursor-pointer w-32 h-32 object-cover hover:opacity-50 hover:bg-opacity-50 hover:bg-red-500"
         src={
           uploadImages[index] ? URL.createObjectURL(uploadImages[index]) : ""
         }
+      />
+      <input
+        type="file"
+        accept="image/*"
+        style={{ display: "none" }}
+        onChange={handleChangeImg}
       />
     </>
   );
@@ -81,6 +98,21 @@ function AddProduct({ isLoggedIn }) {
     setUploadImages((prev) => {
       return [...prev, ...e.target.files];
     });
+  };
+
+  // Change single uploaded image
+  const onUpdateImg = async (e) => {
+    e.preventDefault();
+    // Click the invisble input type=file element behind the image
+    e.target.nextElementSibling.click();
+    console.log(e.target);
+  };
+
+  // Change one single image by grabbing current ones, updating correct index and change state
+  const updateSelectedImg = async (img, index) => {
+    const updatedImages = [...uploadImages];
+    updatedImages[index] = img;
+    setUploadImages(updatedImages);
   };
 
   // Delete image
@@ -275,15 +307,23 @@ function AddProduct({ isLoggedIn }) {
       {accesses.includes("post_images") && (
         <>
           <div className="mt-4 flex flex-wrap mb-4">
-            {uploadImages.map((image, index) => (
+            {uploadImages.map((_, index) => (
               <UploadImg
                 key={index} // Use the index as the key
                 uploadImages={uploadImages}
                 index={index}
                 onDeleteImage={onDeleteImage}
+                onUpdateImg={onUpdateImg}
+                updateSelectedImg={updateSelectedImg}
               />
             ))}
           </div>
+          {accesses.includes("delete_images") && uploadImages.length > 0 && (
+            <p className="text-gray-950 font-bold mb-3 italic">
+              Vänsterklick = Radera bild UTAN bekräftelse
+              <br /> Högerklick = Byta bild (ladda upp)
+            </p>
+          )}
           <label
             htmlFor="filesID"
             className="block w-fit hover:cursor-pointer hover:bg-blue-700 bg-blue-500 p-3 rounded-lg ml-4 mb-4 text-white font-bold">

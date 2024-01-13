@@ -29,11 +29,10 @@ function Image({
   return (
     <>
       <img
-        title="VÄNSTERKLICKA FÖR ATT RADERA DIREKT FRÅN DATABAS!"
         onClick={onImgClickDelete}
         onContextMenu={onUpdateImg}
         alt={image.slice(0, image.lastIndexOf("."))}
-        className="mx-4 cursor-pointer w-32 h-32 object-cover hover:opacity-50 hover:bg-opacity-50 hover:bg-red-500"
+        className="m-1 cursor-pointer w-32 h-32 object-cover hover:opacity-50 hover:bg-opacity-50 hover:bg-red-500"
         src={`${IMGURL}/${id}/${image}`}
       />
       <input
