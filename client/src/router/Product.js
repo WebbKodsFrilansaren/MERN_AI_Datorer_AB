@@ -8,14 +8,12 @@ const IMGURL = "http://localhost:5000/images";
 
 // First letter always uppercase!
 function Product({ isLoggedIn }) {
+  // Current access_token & roles values when navigating here!
+  const { aToken, accesses } = useContext(AuthContext);
+
   const axiosWithRefresh = useAxiosWithRefresh();
   // Navigate back to previous page (just like in go back function from VueJS)
   const navigate = useNavigate();
-  const goBack = () => {
-    navigate(-1);
-  };
-  // Current access_token & roles values when navigating here!
-  const { aToken, accesses } = useContext(AuthContext);
 
   // If user is NOT logged in, take them to login page!
   useEffect(() => {
@@ -24,9 +22,13 @@ function Product({ isLoggedIn }) {
     }
   });
 
+  const goBack = () => {
+    navigate(-1);
+  };
+
   // States to show one product
   const [singleProduct, setSingleProduct] = useState(null);
-  const [isModalOpen, setModalOpen] = useState(false); // Logout modal
+  const [isModalOpen, setModalOpen] = useState(false); // Delete modal
   const [errorMsgs, setErrMsgs] = useState({
     errNoProduct: "",
     errDeleteProduct: "",
@@ -218,6 +220,7 @@ function Product({ isLoggedIn }) {
         isOpen={isModalOpen}
         onCancel={cancelDelete}
         onConfirm={confirmDelete}
+        singleProduct={singleProduct}
       />
       <p className="text-green-500 text-left font-extrabold px-4">
         {errorMsgs.successDelete}

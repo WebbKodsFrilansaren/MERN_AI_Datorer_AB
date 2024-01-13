@@ -64,7 +64,16 @@ function App() {
   // State-based JSX
   return (
     <AuthContext.Provider
-      value={{ aToken, setAToken, isAdmin, setIsLoggedIn, accesses }}>
+      value={{
+        aToken,
+        setAToken,
+        isAdmin,
+        isLoggedIn,
+        setIsAdmin,
+        setIsLoggedIn,
+        accesses,
+        setAccesses,
+      }}>
       <div className="mx-auto">
         <Header
           isLoggedIn={isLoggedIn}

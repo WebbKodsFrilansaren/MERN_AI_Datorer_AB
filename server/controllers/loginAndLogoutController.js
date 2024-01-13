@@ -107,9 +107,11 @@ const loginPOST = async (req, res) => {
 
           // "roles:" will include what access user has PLUS whether account is activated and/or blocked
           correctUser.roles.push(
-            correctUser.account_activated ? "activated" : ""
+            correctUser.account_activated ? "activated" : "notactivated"
           );
-          correctUser.roles.push(correctUser.account_blocked ? "blocked" : "");
+          correctUser.roles.push(
+            correctUser.account_blocked ? "blocked" : "notblocked"
+          );
 
           // if logged in user is "sysadmin" also include a property for that which is true
           // filter out empty string elements from roles array

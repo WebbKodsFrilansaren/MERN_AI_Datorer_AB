@@ -8,7 +8,7 @@ const BASEURL = "http://localhost:5000/api";
 // This CRUD Hook "intercepts" and tries
 const useAxiosWithRefresh = () => {
   const navigate = useNavigate();
-  const { setAToken, setIsLoggedIn } = useContext(AuthContext);
+  const { setAToken, setIsLoggedIn, setIsAdmin } = useContext(AuthContext);
   const axiosWithRefresh = axios.create({
     baseURL: BASEURL,
   });
@@ -30,6 +30,7 @@ const useAxiosWithRefresh = () => {
         } catch (error) {
           // If failed refreshing refresh_token means we need to login again!
           setAToken("");
+          setIsAdmin(false);
           setIsLoggedIn(false);
           navigate("/login");
         }

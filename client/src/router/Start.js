@@ -1,17 +1,19 @@
 import "../App.css";
 import { useState, useEffect, useContext } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import AuthContext from "../middleware/AuthContext";
 import useAxiosWithRefresh from "../middleware/axiosWithRefresh";
 const IMGURL = "http://localhost:5000/images";
 
 function Start({ isLoggedIn }) {
+  // Current access_token & roles values when navigating here!
+  const { aToken, accesses } = useContext(AuthContext);
   const axiosWithRefresh = useAxiosWithRefresh();
-  // Current access_token value when navigating here!
-  const { aToken } = useContext(AuthContext);
-
-  // Navigate and redirect user with this!
+  // Navigate back to previous page (just like in go back function from VueJS)
   const navigate = useNavigate();
+  const goBack = () => {
+    navigate(-1);
+  };
 
   // If user is NOT logged in, take them to login page!
   useEffect(() => {
@@ -24,15 +26,6 @@ function Start({ isLoggedIn }) {
   const [latestProduct, setlatestProduct] = useState(null);
   const [errorMsgs, setErrMsgs] = useState({ errProduct: "" });
 
-  // Show error when product is not shown
-  useEffect(() => {
-    if (latestProduct === false) {
-      setErrMsgs({ errProduct: "Produkt saknas eller du saknar åtkomst!" });
-    } else {
-      setErrMsgs({ errProduct: "" });
-    }
-  }, [latestProduct]);
-
   // Fetch products but only return last one (at(-1)) when component is mounted
   useEffect(() => {
     axiosWithRefresh
@@ -43,7 +36,7 @@ function Start({ isLoggedIn }) {
       .then((res) => {
         if (res.status === 200) {
           setlatestProduct(res.data.data.at(-1));
-        } else if (res.status === 403) {
+        } else if (res.status === 404 || res.status === 403) {
           setlatestProduct(false);
         } else {
           setErrMsgs({
@@ -54,13 +47,32 @@ function Start({ isLoggedIn }) {
       });
   }, []);
 
-  if (latestProduct === null)
-    return <div>Provar ladda in senast produkt...</div>;
-  else if (latestProduct === false)
+  if (latestProduct === null) return <div>LADDAR IN SENAST PRODUKT...</div>;
+  if (latestProduct === false)
     return (
-      <p className="text-red-500 font-bold px-4 text-center">
-        Du saknar behörighet att visa produkter!
-      </p>
+      <div className="text-center text-lg">
+        <p className="text-red-500 font-bold px-4 text-center">
+          Produkten finns ej eller du saknar behörighet att se den!
+        </p>
+        <button
+          onClick={goBack}
+          className="bg-black hover:bg-gray-500 text-white font-semibold p-2 m-1 rounded-lg">
+          Tillbaka
+        </button>
+      </div>
+    );
+  else if (!accesses.includes("get_components"))
+    return (
+      <>
+        <p className="text-red-500 font-bold px-4 text-center">
+          Du saknar behörighet att visa produkter!
+        </p>
+        <button
+          onClick={goBack}
+          className="bg-black hover:bg-gray-500 text-white font-semibold p-2 m-1 rounded-lg">
+          Tillbaka
+        </button>
+      </>
     );
   return (
     <div className="min-h-screen">

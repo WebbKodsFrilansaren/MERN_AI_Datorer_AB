@@ -7,7 +7,7 @@ import axios from "../middleware/axios";
 // Props that can be used to tell "parent" component something happened on our end
 function Login({ setAccessToken, setLoginSuccess, setAdmin, setAccess }) {
   // Current access_token value when navigating here!
-  const { aToken } = useContext(AuthContext);
+  const { aToken, isLoggedIn } = useContext(AuthContext);
 
   // Navigate and redirect user with this!
   const navigate = useNavigate();
@@ -24,7 +24,7 @@ function Login({ setAccessToken, setLoginSuccess, setAdmin, setAccess }) {
 
   // If user is already logged in, take them to starting page!
   useEffect(() => {
-    if (aToken.includes("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9")) {
+    if (isLoggedIn) {
       navigate("/");
     }
   });
@@ -65,19 +65,27 @@ function Login({ setAccessToken, setLoginSuccess, setAdmin, setAccess }) {
         );
         if (res.status === 200) {
           // Tell `App.js` it succeeded logging in and provide accessToken & roles
-          setAccessToken(res.data.accessToken);
-          setAccess(res.data.roles);
-          setLoginSuccess(true);
-          setloggedInSuccess(res.data.success);
-          // Also tell if it is admin user
-          if ("isAdmin" in res.data) {
-            setAdmin(true);
+          // Check in roles: array if account is NOT activated thus not allowing to login!
+          if (res.data.roles.includes("notactivated")) {
+            alert(
+              "Be Systemadministratören aktivera ditt konto innan du kan använda det!"
+            );
+          } // account IS activated to procede to login
+          else {
+            setAccessToken(res.data.accessToken);
+            setAccess(res.data.roles);
+            setLoginSuccess(true);
+            setloggedInSuccess(res.data.success);
+            // Also tell if it is admin user
+            if ("isAdmin" in res.data) {
+              setAdmin(true);
+            }
+            // Then move to Start page and also reset login
+            setTimeout(() => {
+              setloggedInSuccess(false);
+              navigate("/");
+            }, 3333);
           }
-          // Then move to Start page and also reset login
-          setTimeout(() => {
-            setloggedInSuccess(false);
-            navigate("/");
-          }, 3333);
         } else {
           setErrMsgs((prev) => {
             return {
