@@ -71,7 +71,6 @@ function Product({ isLoggedIn }) {
         }, 3333);
       }
     } catch (e) {
-      console.log(e);
       setErrMsgs({
         errDeleteProduct: "Kontakta Webbutvecklaren för klienthjälp. Bugg!",
       });
@@ -172,7 +171,7 @@ function Product({ isLoggedIn }) {
             <img
               key={i}
               alt={image.slice(0, image.lastIndexOf("."))}
-              className="block mx-auto h-[333px] mb-2"
+              className="inline mx-auto h-[333px] m-1 p-2"
               src={`${IMGURL}/${id}/${image}`}
             />
           ))}
@@ -185,13 +184,8 @@ function Product({ isLoggedIn }) {
           Inga produktbilder finns än!
         </p>
       )}
-      <div className="px-4">
-        <p className="text-red-500 text-left font-bold">{}</p>
-        <div className="flex flex-row">
-          <div className="mx-4 cursor-pointer w-32 h-32 object-cover hover:opacity-50" />
-        </div>
-      </div>
-      <div className="flex lg:justify-left mt-2">
+
+      <div className="flex justify-center mt-2">
         <div className="flex justify-center">
           {/* Access to Edit/Delete buttons based on user access! */}
           {accesses.includes("put_components") && (
@@ -200,14 +194,14 @@ function Product({ isLoggedIn }) {
                 navigate(`/products/${singleProduct.componentid}/edit`)
               }
               className="bg-blue-800 hover:bg-blue-500 text-white font-semibold
-            p-2 m-1 rounded-lg">
+            p-2 m-1 rounded-lg  mr-4">
               Redigera
             </button>
           )}
           {accesses.includes("delete_components") && (
             <button
               onClick={deleteClick}
-              className="bg-red-800 hover:bg-red-500 text-white font-semibold p-2 m-1 rounded-lg">
+              className="bg-red-800 hover:bg-red-500 text-white font-semibold p-2 m-1 mr-4 rounded-lg">
               Radera
             </button>
           )}

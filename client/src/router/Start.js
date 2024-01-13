@@ -94,7 +94,7 @@ function Start({ isLoggedIn }) {
       {latestProduct && (
         <div className="w-fit mx-auto">
           <div className="bg-white rounded-lg p-6 shadow-md mb-4">
-            <h2 className="font-bold text-left underline px-4 text-xl hover:underline-offset-4 hover:cursor-pointer hover:text-gray-500">
+            <h2 className="font-bold text-center underline px-4 text-xl hover:underline-offset-4 hover:cursor-pointer hover:text-gray-500">
               <button
                 className="cursor-pointer hover:underline underline mb-4"
                 onClick={() =>

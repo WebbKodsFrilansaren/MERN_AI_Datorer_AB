@@ -139,12 +139,10 @@ function EditProduct({ isLoggedIn }) {
     e.preventDefault();
     // Click the invisble input type=file element behind the image
     e.target.nextElementSibling.click();
-    console.log(e.target);
   };
 
   // FUNCTION: Update selected (right-clicked) uploaded image
   const updateSelectedImg = async (img, index) => {
-    console.log(img);
     try {
       // Prepare image
       const formData = new FormData();
@@ -421,7 +419,6 @@ function EditProduct({ isLoggedIn }) {
         }, 3333);
       }
     } catch (e) {
-      console.log(e);
       setMsgs({
         errordelete: "Kontakta Webbutvecklaren för klienthjälp. Bugg!",
       });
