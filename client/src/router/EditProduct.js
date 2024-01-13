@@ -1,5 +1,5 @@
 import "../App.css";
-import { useState, useEffect, useContext, useRef } from "react";
+import { useState, useEffect, useContext } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import AuthContext from "../middleware/AuthContext";
 import ModalDeleteProduct from "../components/ModalDeleteProduct";
@@ -13,7 +13,6 @@ function Image({
   onDeleteImage,
   index,
   onUpdateImg,
-  inputRef,
   updateSelectedImg,
 }) {
   // Send id and index when deleting left-clicked image
@@ -38,7 +37,6 @@ function Image({
         src={`${IMGURL}/${id}/${image}`}
       />
       <input
-        ref={inputRef}
         type="file"
         accept="image/*"
         style={{ display: "none" }}
@@ -56,7 +54,6 @@ function EditProduct({ isLoggedIn }) {
   const { aToken, accesses } = useContext(AuthContext);
   const axiosWithRefresh = useAxiosWithRefresh();
   const { id } = useParams(); // grab :id value from URL
-  const inputRef = useRef(null);
   // If user is NOT logged in, take them to login page!
   useEffect(() => {
     if (!isLoggedIn) {
@@ -141,9 +138,8 @@ function EditProduct({ isLoggedIn }) {
 
   const onUpdateImg = async (e) => {
     e.preventDefault();
-
     // Click the invisble input type=file element behind the image
-    inputRef.current.click();
+    e.target.nextElementSibling.click();
     console.log(e.target);
   };
 
@@ -181,10 +177,15 @@ function EditProduct({ isLoggedIn }) {
       } else {
         setMsgs({
           errorimage:
-            res.data?.error || "Bilden misslyckades tas bort ur databas!",
+            res.data?.error ||
+            "Bilden misslyckades uppdateras i databas. Kontakta Systemadministratör!",
         });
       }
-    } catch (err) {}
+    } catch (err) {
+      setMsgs({
+        errorimage: "Bilden misslyckades tas bort ur databas!",
+      });
+    }
   };
 
   // Fetch single producted after component is mounted
@@ -503,7 +504,6 @@ function EditProduct({ isLoggedIn }) {
           <div className="flex mb-4">
             {images.map((image, i) => (
               <Image
-                inputRef={inputRef}
                 onDeleteImage={onDeleteImage}
                 onUpdateImg={onUpdateImg}
                 updateSelectedImg={updateSelectedImg}

@@ -421,6 +421,7 @@ const putSinglePCcomponentImage = async (req, res) => {
   const username = req.authData.username;
   // Init MongoDB
   let client;
+
   try {
     // Then grab maka2207 database and its collections:
     client = req.dbClient;
@@ -436,6 +437,7 @@ const putSinglePCcomponentImage = async (req, res) => {
         .status(403)
         .json({ error: "Åtkomst nekad! (Ingen användare)" });
     }
+
     // Then check if they are authorized to continue the request
     if (!findUser.roles.includes("put_images")) {
       fs.unlink(req.file.path);
@@ -459,7 +461,7 @@ const putSinglePCcomponentImage = async (req, res) => {
       });
     }
 
-    // When :arrayindex (index of image in array of images) doesn't exist
+    // If image index for component doesn't exist
     if (
       typeof findSingleComponent.componentImages[validImageIndex] ===
       "undefined"
@@ -473,94 +475,108 @@ const putSinglePCcomponentImage = async (req, res) => {
       });
     }
 
-    // If image to change exists, grab image array and swap image
-    const imgPath = process.cwd() + "\\server\\images\\" + validComponentID;
-    const newImgArray = findSingleComponent.componentImages;
-    const oldImage = imgPath + "\\" + newImgArray[validImageIndex];
-
-    console.log(oldImage);
-
-    // If image to swap doesn't exist
-    if (!existsSync(oldImage)) {
-      fs.unlink(req.file.path);
-      client.close();
-      return res.status(404).json({
-        error: `Bilden med index ${validImageIndex} (bildnummer:${
-          validImageIndex + 1
-        }) i komponenten med id:${validComponentID} finns inte!`,
-      });
-    }
-    // Old image, first find last occurence of "-", slice from that, split on its ".", split then
-    // on "-" and thus you get the  current counting number for that picture to replace with
-    const oldImageCounter = oldImage
-      .slice(oldImage.lastIndexOf("-"))
-      .split(".")[0]
-      .split("-")[1];
-
+    // Prepare to PUT a single image of a current /:componentid/:arrayindex
+    let imgArray = [];
+    let counter = 1;
+    let firstImage = true;
+    const reqfilepath = req.file.path;
+    const reqfileoriginalname = req.file.originalname;
+    let lastImageName = "";
     const lastDotInFileName = req.file.originalname.lastIndexOf(".");
     const fileNameWithOutDot = req.file.originalname.slice(
       0,
       lastDotInFileName
     );
-    try {
-      fs.rename(
-        req.file.path,
-        imgPath +
-          "\\" +
-          fileNameWithOutDot +
-          "-" +
-          oldImageCounter +
-          req.file.originalname.slice(lastDotInFileName)
-      );
-    } catch (err) {
-      if (err) {
-        console.error(err);
-        fs.unlink(req.file.path);
-        client.close();
-        // Handle error appropriately, e.g., return an error response
-        return res
-          .status(500)
-          .json({ error: "Misslyckades att uppdatera vald bild!." });
-      }
+    const imgPath =
+      process.cwd() + "\\server\\images\\" + findSingleComponent.componentid;
+    const oldImage =
+      imgPath + "\\" + findSingleComponent.componentImages[validImageIndex];
+
+    // Delete old image
+    await fs.unlink(oldImage);
+
+    // Set whether it is first image or not so we can do differently from here
+    if (findSingleComponent.componentImages.length > 0) {
+      firstImage = false;
     }
 
-    // Store the new swapped image before updating
-    newImgArray[validImageIndex] =
-      fileNameWithOutDot +
-      "-" +
-      oldImageCounter +
-      req.file.originalname.slice(lastDotInFileName);
+    // If not first image, store current ones in `imgArray`
+    // filter out image that is already removed file-wise
+    if (!firstImage) {
+      imgArray = findSingleComponent.componentImages.filter(
+        (img, i) => i !== validImageIndex
+      );
+      lastImageName = findSingleComponent.componentImages.at(-1);
 
-    const updatedImg =
+      // Also set counter to the last uploaded image's counter + 1
+      counter =
+        parseInt(
+          lastImageName
+            .slice(lastImageName.lastIndexOf("-"))
+            .split(".")[0]
+            .split("-")[1]
+        ) + 1;
+    }
+
+    // Create folder /:componentid/ if it doesn't exist
+    if (!existsSync(imgPath)) {
+      fs.mkdir(imgPath);
+    }
+
+    // Push now it to array which is either empty or has all current images!
+    const latestImg =
       fileNameWithOutDot +
       "-" +
       counter +
       req.file.originalname.slice(lastDotInFileName);
 
-    // When it exists, first prepare it
-    const updateComponent = {
-      componentImages: newImgArray,
-    };
+    // Push to array
+    imgArray.push(latestImg);
 
-    // Then, try updating it
-    const tryUpdateComponent = await dbColPCComponents.updateOne(
-      { componentid: validComponentID },
-      { $set: updateComponent }
-    );
-
-    // If = failed updating component | Else = succeeded updating component
-    if (!tryUpdateComponent) {
+    // Move file into correct /:componentid/ folder
+    try {
+      fs.rename(
+        reqfilepath,
+        imgPath +
+          "\\" +
+          fileNameWithOutDot +
+          "-" +
+          counter +
+          reqfileoriginalname.slice(lastDotInFileName)
+      );
+    } catch (e) {
       fs.unlink(req.file.path);
       client.close();
       return res
         .status(500)
-        .json({ error: "Misslyckades att uppdatera bilden till komponenten!" });
-    } else {
-      fs.unlink(oldImage);
+        .json({ error: "Databasfel. Kontakta Systemadministratören!" });
+    }
+
+    // Then prepare for updating correct :componentid and its selected image
+    const putSingleImage = {
+      componentImages: imgArray,
+    };
+
+    // Then, try updating it
+    const tryPutSingleImage = await dbColPCComponents.updateOne(
+      { componentid: validComponentID },
+      { $set: putSingleImage }
+    );
+
+    // if = succeeded inserting new component | else = failed trying it
+    // "latestImg" is the latest added so it can be updated in ReactJS client
+    if (tryPutSingleImage) {
       client.close();
       return res.status(200).json({
         success: "En bild till komponenten har uppdaterats!",
-        data: updatedImg,
+        data: latestImg,
+      });
+    } else {
+      fs.unlink(reqfilepath);
+      client.close();
+      return res.status(500).json({
+        error:
+          "Misslyckades att uppdatera bild till komponent. Kontakta Systemadministratören!",
       });
     }
   } catch (e) {
@@ -569,11 +585,6 @@ const putSinglePCcomponentImage = async (req, res) => {
     return res
       .status(500)
       .json({ error: "Databasfel. Kontakta Systemadministratören!" });
-  } finally {
-    // If file still exists in upload directory because of caught (JSON) error, remove it
-    if (existsSync(req.file.path)) {
-      fs.unlink(req.file.path);
-    }
   }
 };
 
