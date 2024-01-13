@@ -478,7 +478,9 @@ const putSinglePCcomponentImage = async (req, res) => {
     const newImgArray = findSingleComponent.componentImages;
     const oldImage = imgPath + "\\" + newImgArray[validImageIndex];
 
-    // If image to swap doesn'¨t exist
+    console.log(oldImage);
+
+    // If image to swap doesn't exist
     if (!existsSync(oldImage)) {
       fs.unlink(req.file.path);
       client.close();
@@ -500,21 +502,39 @@ const putSinglePCcomponentImage = async (req, res) => {
       0,
       lastDotInFileName
     );
-    fs.rename(
-      req.file.path,
-      imgPath +
-        "\\" +
-        fileNameWithOutDot +
-        "-" +
-        oldImageCounter +
-        req.file.originalname.slice(lastDotInFileName)
-    );
+    try {
+      fs.rename(
+        req.file.path,
+        imgPath +
+          "\\" +
+          fileNameWithOutDot +
+          "-" +
+          oldImageCounter +
+          req.file.originalname.slice(lastDotInFileName)
+      );
+    } catch (err) {
+      if (err) {
+        console.error(err);
+        fs.unlink(req.file.path);
+        client.close();
+        // Handle error appropriately, e.g., return an error response
+        return res
+          .status(500)
+          .json({ error: "Misslyckades att uppdatera vald bild!." });
+      }
+    }
 
     // Store the new swapped image before updating
     newImgArray[validImageIndex] =
       fileNameWithOutDot +
       "-" +
       oldImageCounter +
+      req.file.originalname.slice(lastDotInFileName);
+
+    const updatedImg =
+      fileNameWithOutDot +
+      "-" +
+      counter +
       req.file.originalname.slice(lastDotInFileName);
 
     // When it exists, first prepare it
@@ -538,9 +558,10 @@ const putSinglePCcomponentImage = async (req, res) => {
     } else {
       fs.unlink(oldImage);
       client.close();
-      return res
-        .status(200)
-        .json({ success: "En bild till komponenten har uppdaterats!" });
+      return res.status(200).json({
+        success: "En bild till komponenten har uppdaterats!",
+        data: updatedImg,
+      });
     }
   } catch (e) {
     fs.unlink(req.file.path);

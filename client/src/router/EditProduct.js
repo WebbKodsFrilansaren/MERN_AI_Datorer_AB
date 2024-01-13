@@ -1,5 +1,5 @@
 import "../App.css";
-import { useState, useEffect, useContext } from "react";
+import { useState, useEffect, useContext, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import AuthContext from "../middleware/AuthContext";
 import ModalDeleteProduct from "../components/ModalDeleteProduct";
@@ -7,18 +7,44 @@ import useAxiosWithRefresh from "../middleware/axiosWithRefresh";
 const IMGURL = "http://localhost:5000/images";
 
 // Each picture component which uses array index of images to delete it
-function Image({ image, id, onDeleteImage, index }) {
+function Image({
+  image,
+  id,
+  onDeleteImage,
+  index,
+  onUpdateImg,
+  inputRef,
+  updateSelectedImg,
+}) {
+  // Send id and index when deleting left-clicked image
   const onImgClickDelete = async (e) => {
     onDeleteImage(id, index);
   };
+
+  // Send chosen image file when right-clicked on image to update that single image
+  const handleChangeImg = (e) => {
+    const selectedFile = e.target.files[0];
+    updateSelectedImg(selectedFile, index);
+  };
+
   return (
-    <img
-      title="VÄNSTERKLICKA FÖR ATT RADERA DIREKT FRÅN DATABAS!"
-      onClick={onImgClickDelete}
-      alt={image.slice(0, image.lastIndexOf("."))}
-      className="mx-4 cursor-pointer w-32 h-32 object-cover hover:opacity-50 hover:bg-opacity-50 hover:bg-red-500"
-      src={`${IMGURL}/${id}/${image}`}
-    />
+    <>
+      <img
+        title="VÄNSTERKLICKA FÖR ATT RADERA DIREKT FRÅN DATABAS!"
+        onClick={onImgClickDelete}
+        onContextMenu={onUpdateImg}
+        alt={image.slice(0, image.lastIndexOf("."))}
+        className="mx-4 cursor-pointer w-32 h-32 object-cover hover:opacity-50 hover:bg-opacity-50 hover:bg-red-500"
+        src={`${IMGURL}/${id}/${image}`}
+      />
+      <input
+        ref={inputRef}
+        type="file"
+        accept="image/*"
+        style={{ display: "none" }}
+        onChange={handleChangeImg}
+      />
+    </>
   );
 }
 
@@ -30,7 +56,7 @@ function EditProduct({ isLoggedIn }) {
   const { aToken, accesses } = useContext(AuthContext);
   const axiosWithRefresh = useAxiosWithRefresh();
   const { id } = useParams(); // grab :id value from URL
-
+  const inputRef = useRef(null);
   // If user is NOT logged in, take them to login page!
   useEffect(() => {
     if (!isLoggedIn) {
@@ -113,6 +139,54 @@ function EditProduct({ isLoggedIn }) {
     }
   };
 
+  const onUpdateImg = async (e) => {
+    e.preventDefault();
+
+    // Click the invisble input type=file element behind the image
+    inputRef.current.click();
+    console.log(e.target);
+  };
+
+  // FUNCTION: Update selected (right-clicked) uploaded image
+  const updateSelectedImg = async (img, index) => {
+    console.log(img);
+    try {
+      // Prepare image
+      const formData = new FormData();
+      formData.append("componentimages", img);
+      const res = await axiosWithRefresh.put(
+        `/pccomponents/${id}/images/${index}`,
+        formData,
+        {
+          validateStatus: () => true,
+          headers: { Authorization: `Bearer ${aToken}` },
+        }
+      );
+      // If image was updated
+      if (res.status === 200) {
+        // Update state after successful image delete
+        const currentImages = [...images]; // Grab current images
+        currentImages[index] = res.data.data; // Change the new uploaded image in correct index
+        setImages(currentImages); // Then change its state
+        setMsgs({ successimage: "Bild uppdaterad i databas för komponenten!" });
+        setTimeout(() => {
+          setMsgs({ successimage: "" });
+        }, 3333);
+      } // When image was NOT removed!
+      else if (res.status === 403) {
+        setMsgs({ errorimage: "Du saknar behörighet att ändra bilden!" });
+        setTimeout(() => {
+          setMsgs({ errorimage: "" });
+        }, 3333);
+      } else {
+        setMsgs({
+          errorimage:
+            res.data?.error || "Bilden misslyckades tas bort ur databas!",
+        });
+      }
+    } catch (err) {}
+  };
+
   // Fetch single producted after component is mounted
   useEffect(() => {
     axiosWithRefresh
@@ -151,7 +225,6 @@ function EditProduct({ isLoggedIn }) {
   }, [editBody.componentimages]);
 
   const onDeleteImage = async (id, index) => {
-    //confirm("RADERA BILD FRÅN DATABAS? KAN EJ ÅNGRAS!!!");
     const res = await axiosWithRefresh.delete(
       `/pccomponents/${id}/images/${index}`,
       {
@@ -159,7 +232,6 @@ function EditProduct({ isLoggedIn }) {
         headers: { Authorization: `Bearer ${aToken}` },
       }
     );
-
     // If image was removed!
     if (res.status === 200) {
       // Update state after successful image delete
@@ -167,6 +239,12 @@ function EditProduct({ isLoggedIn }) {
       setMsgs({ successimage: "Bild borttagen från databas för komponenten!" });
       setTimeout(() => {
         setMsgs({ successimage: "" });
+      }, 3333);
+    } // When image was NOT removed!
+    else if (res.status === 403) {
+      setMsgs({ errorimage: "Du saknar behörighet att ta bort bilden!" });
+      setTimeout(() => {
+        setMsgs({ errorimage: "" });
       }, 3333);
     } else {
       setMsgs({
@@ -425,7 +503,10 @@ function EditProduct({ isLoggedIn }) {
           <div className="flex mb-4">
             {images.map((image, i) => (
               <Image
+                inputRef={inputRef}
                 onDeleteImage={onDeleteImage}
+                onUpdateImg={onUpdateImg}
+                updateSelectedImg={updateSelectedImg}
                 key={i}
                 image={image}
                 id={id}
