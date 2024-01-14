@@ -16,6 +16,7 @@ import EditProduct from "./router/EditProduct";
 import AddProduct from "./router/AddProduct";
 import Admin from "./router/Admin";
 import AddUser from "./router/AddUser";
+import EditUser from "./router/EditUser";
 
 // Global components thanks to useContext()
 import AuthContext from "./middleware/AuthContext"; // useContext for:"aToken, setAToken, accesses & isAdmin & isLoggedIn"
@@ -120,6 +121,9 @@ function App() {
             <Route
               path="/admin/adduser"
               element={<AddUser isLoggedIn={isLoggedIn} />}></Route>
+            <Route
+              path="/admin/edituser/:id"
+              element={<EditUser isLoggedIn={isLoggedIn} />}></Route>
 
             {/* CATCH ANY INVALID ROUTE!! */}
             <Route path="/*" element={<NotFound />}></Route>

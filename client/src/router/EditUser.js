@@ -1,15 +1,16 @@
 import "../App.css";
 import { useState, useEffect, useContext } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import AuthContext from "../middleware/AuthContext";
 import useAxiosWithRefresh from "../middleware/axiosWithRefresh";
 
-function AddUser({ isLoggedIn }) {
+function EditUser({ isLoggedIn }) {
   // Navigate back to previous page (just like in go back function from VueJS)
   const navigate = useNavigate();
   // Current access_token value when navigating here!
   const { aToken, accesses } = useContext(AuthContext);
   const axiosWithRefresh = useAxiosWithRefresh();
+  const { id } = useParams(); // grab :id value from URL
   // If user is NOT logged in, take them to login page!
   useEffect(() => {
     if (!isLoggedIn) {
@@ -22,7 +23,8 @@ function AddUser({ isLoggedIn }) {
   };
 
   // useStates
-  const [addUserBody, setAddUserBody] = useState({
+  const [userExists, setUserExists] = useState(null);
+  const [editUserBody, setEditUserBody] = useState({
     username: "",
     email: "",
     fullname: "",
@@ -39,8 +41,6 @@ function AddUser({ isLoggedIn }) {
     can_delete_components: false,
   });
   const [msg, setMsgs] = useState({
-    erroradduser: "",
-    successadduser: "",
     errusername: "",
     erremail: "",
     errfullname: "",
@@ -55,16 +55,19 @@ function AddUser({ isLoggedIn }) {
     errcan_post_components: "",
     errcan_delete_images: "",
     errcan_delete_components: "",
+    errorupdateuser: "",
+    successupdateuser: "",
+    errorfetchuser: "",
   });
 
   // Handle Add Product Click
-  const addUserClick = async (e) => {
+  const editUserClick = async (e) => {
     // Prevent default, reset (error) messages
     e.preventDefault();
     setMsgs((prev) => {
       return {
-        erroradduser: "",
-        successadduser: "",
+        errorupdateser: "",
+        successupdateuser: "",
         errusername: "",
         erremail: "",
         errfullname: "",
@@ -82,61 +85,54 @@ function AddUser({ isLoggedIn }) {
       };
     });
     // Then check fields are not empty
-    if (addUserBody.username.trim() === "") {
+    if (editUserBody.username.trim() === "") {
       setMsgs((prev) => {
         return { ...prev, errusername: "Ange ett användarnamn!" };
       });
     }
-    if (addUserBody.fullname.trim() === "") {
+    if (editUserBody.fullname.trim() === "") {
       setMsgs((prev) => {
         return { ...prev, errfullname: "Ange ett fullständigt namn!" };
       });
     }
-    if (addUserBody.email.trim() === "") {
+    if (editUserBody.email.trim() === "") {
       setMsgs((prev) => {
         return { ...prev, erremail: "Ange en e-post!" };
       });
-    }
-    if (addUserBody.password.trim() === "") {
-      setMsgs((prev) => {
-        return { ...prev, errpassword: "Ange ett lösenord!" };
-      });
-    }
+    } // We don't check password cause it can be empty (not wanna change it)
 
     // Only POST request when ALL fields are NOT empty!
     if (
-      addUserBody.username !== "" &&
-      addUserBody.email !== "" &&
-      addUserBody.fullname !== "" &&
-      addUserBody.password !== ""
+      editUserBody.username !== "" &&
+      editUserBody.email !== "" &&
+      editUserBody.fullname !== ""
     ) {
       // Now make POST!
       // ALL OK HERE SO PREPARE PUT REQUEST!
       try {
-        // Make POST Request "addUserBody" is already correct by now!
-        const res = await axiosWithRefresh.post(`/users`, addUserBody, {
+        // Make POST Request "editUserBody" is already correct by now!
+        const res = await axiosWithRefresh.put(`/users/${id}`, editUserBody, {
           validateStatus: () => true,
           headers: { Authorization: `Bearer ${aToken}` },
         });
         // When success adding user
-        if (res.status === 201) {
+        if (res.status === 200) {
           setMsgs({
-            successadduser: res.data.success + " Går till adminsidan...",
+            successupdateuser: res.data.success,
           });
           setTimeout(() => {
-            setMsgs({ successadduser: "" });
-            navigate("/admin");
+            setMsgs({ successupdateuser: "" });
           }, 3333);
         } // Show error messages
         else {
           setMsgs({
-            erroradduser:
-              res.data?.error || "Misslyckades att skapa användaren!",
+            errorupdateuser:
+              res.data?.error || "Misslyckades att spara ändringarna!",
           });
         }
       } catch (err) {
         setMsgs({
-          erroradduser: "Kontakta Webbutvecklaren för klienthjälp. Bugg!",
+          errorupdateuser: "Kontakta Webbutvecklaren för klienthjälp. Bugg!",
         });
       }
     }
@@ -148,7 +144,7 @@ function AddUser({ isLoggedIn }) {
     const { id, value } = e.target;
     if (e.target.id === id) {
       // Set correct property based on same `id` name in e.target.id as in registerBody object
-      setAddUserBody((prev) => {
+      setEditUserBody((prev) => {
         return { ...prev, [id]: value };
       });
       // Also delete its corresponding "err+[id]" message
@@ -163,11 +159,72 @@ function AddUser({ isLoggedIn }) {
   const prepareUserCheckboxes = (e) => {
     const { id, checked } = e.target;
     if (e.target.id === id) {
-      setAddUserBody((prev) => {
+      setEditUserBody((prev) => {
         return { ...prev, [id]: checked };
       });
     }
   };
+
+  // Fetch single producted after component is mounted
+  useEffect(() => {
+    axiosWithRefresh
+      .get(`/users/${id}`, {
+        validateStatus: () => true,
+        headers: { Authorization: `Bearer ${aToken}` },
+      })
+      .then((res) => {
+        if (res.status === 200) {
+          console.log(res.data.data);
+          setEditUserBody({
+            username: res.data.data.username,
+            email: res.data.data.useremail,
+            fullname: res.data.data.userfullname,
+            password: "",
+            account_activated:
+              res.data.data.account_activated === "Ja" ? true : false,
+            account_blocked:
+              res.data.data.account_blocked === "Ja" ? true : false,
+            can_get_images: res.data.data.roles.includes("get_images")
+              ? true
+              : false,
+            can_get_components: res.data.data.roles.includes("get_components")
+              ? true
+              : false,
+            can_put_images: res.data.data.roles.includes("put_images")
+              ? true
+              : false,
+            can_put_components: res.data.data.roles.includes("put_components")
+              ? true
+              : false,
+            can_post_images: res.data.data.roles.includes("post_components")
+              ? true
+              : false,
+            can_post_components: res.data.data.roles.includes("post_components")
+              ? true
+              : false,
+            can_delete_images: res.data.data.roles.includes("delete_images")
+              ? true
+              : false,
+            can_delete_components: res.data.data.roles.includes(
+              "delete_components"
+            )
+              ? true
+              : false,
+          });
+          setUserExists(true);
+        } else if (res.status === 404) {
+          setUserExists(false);
+          setMsgs({
+            errorfetchuser: res.data?.error || "Användaren verkar inte finnas?",
+          });
+        } else {
+          setMsgs({
+            errorfetchuser:
+              res.data?.error || "Fel uppstod vid hämtning av produkt!",
+          });
+        }
+      });
+  }, []);
 
   /* JSX */
   // If not allowed to edit products
@@ -179,9 +236,9 @@ function AddUser({ isLoggedIn }) {
     !accesses.includes("delete_users")
   ) {
     return (
-      <div className="text-center text-lg">
+      <div className="flex justify-center">
         <p className="text-red-500 font-bold px-4 text-center">
-          Du saknar behörighet att skapa användare! Hur ser du detta ens som?
+          Du saknar behörighet att ändra användare! Hur ser du detta ens som?
         </p>
         <button
           onClick={goBack}
@@ -192,10 +249,27 @@ function AddUser({ isLoggedIn }) {
     );
   }
 
+  if (userExists === null)
+    return <div>LADDAR IN ANVÄNDARE ATT REDIGERA... {msg.errorfetchuser}</div>;
+  else if (userExists === false) {
+    return (
+      <>
+        <p className="text-center text-red-500 font-extrabold text-sm">
+          Användaren med id:{id} finns inte! {msg.errorfetchuser}
+        </p>
+        <button
+          onClick={goBack}
+          className="block bg-black hover:bg-gray-500 text-white font-semibold p-2 m-1 rounded-lg">
+          Tillbaka
+        </button>
+      </>
+    );
+  }
+
   // If allowed to add product
   return (
     <div className="p-8 min-h-screen">
-      <h1 className="text-2xl font-bold mb-4">Skapa ny användare</h1>
+      <h1 className="text-2xl font-bold mb-4">Redigera användare</h1>
       <form className="space-y-4">
         <div>
           <label
@@ -208,6 +282,7 @@ function AddUser({ isLoggedIn }) {
             type="text"
             id="username"
             className="mt-1 p-2 w-full border rounded-md"
+            value={editUserBody.username}
           />
           <p className="text-red-500 font-bold">{msg.errusername}</p>
         </div>
@@ -222,6 +297,7 @@ function AddUser({ isLoggedIn }) {
             type="email"
             id="email"
             className="mt-1 p-2 w-full border rounded-md"
+            value={editUserBody.email}
           />
           <p className="text-red-500 font-bold">{msg.erremail}</p>
         </div>
@@ -236,6 +312,7 @@ function AddUser({ isLoggedIn }) {
             type="text"
             id="fullname"
             className="mt-1 p-2 w-full border rounded-md"
+            value={editUserBody.fullname}
           />
           <p className="text-red-500 font-bold">{msg.errfullname}</p>
         </div>
@@ -243,13 +320,14 @@ function AddUser({ isLoggedIn }) {
           <label
             htmlFor="password"
             className="block text-sm font-bold text-gray-600">
-            Lösenord:
+            Lösenord (lämna tomt för ingen förändring):
           </label>
           <input
             onChange={prepareUserBody}
             type="password"
             id="password"
             className="mt-1 p-2 w-full border rounded-md"
+            value={editUserBody.password}
           />
           <p className="text-red-500 font-bold">{msg.errpassword}</p>
         </div>
@@ -260,7 +338,7 @@ function AddUser({ isLoggedIn }) {
               type="checkbox"
               id="account_activated"
               onChange={prepareUserCheckboxes}
-              checked={addUserBody.account_activated}
+              checked={editUserBody.account_activated}
               class="h-[33px] w-[33px] mr-2"
             />
             <span>Aktiverat konto?</span>
@@ -270,7 +348,7 @@ function AddUser({ isLoggedIn }) {
               type="checkbox"
               id="can_get_components"
               onChange={prepareUserCheckboxes}
-              checked={addUserBody.can_get_components}
+              checked={editUserBody.can_get_components}
               class="h-[33px] w-[33px] mr-2"
             />
             <span>Kan visa produkter?</span>
@@ -280,7 +358,7 @@ function AddUser({ isLoggedIn }) {
               type="checkbox"
               id="can_post_components"
               onChange={prepareUserCheckboxes}
-              checked={addUserBody.can_post_components}
+              checked={editUserBody.can_post_components}
               class="h-[33px] w-[33px] mr-2"
             />
             <span>Kan skapa produkter?</span>
@@ -290,7 +368,7 @@ function AddUser({ isLoggedIn }) {
               type="checkbox"
               id="can_put_components"
               onChange={prepareUserCheckboxes}
-              checked={addUserBody.can_put_components}
+              checked={editUserBody.can_put_components}
               class="h-[33px] w-[33px] mr-2"
             />
             <span>Kan ändra produkter?</span>
@@ -300,7 +378,7 @@ function AddUser({ isLoggedIn }) {
               type="checkbox"
               id="can_delete_components"
               onChange={prepareUserCheckboxes}
-              checked={addUserBody.can_delete_components}
+              checked={editUserBody.can_delete_components}
               class="h-[33px] w-[33px] mr-2"
             />
             <span>Kan radera produkter?</span>
@@ -310,7 +388,7 @@ function AddUser({ isLoggedIn }) {
               type="checkbox"
               id="can_get_images"
               onChange={prepareUserCheckboxes}
-              checked={addUserBody.can_get_images}
+              checked={editUserBody.can_get_images}
               class="h-[33px] w-[33px] mr-2"
             />
             <span>Kan visa bilder?</span>
@@ -320,7 +398,7 @@ function AddUser({ isLoggedIn }) {
               type="checkbox"
               id="can_post_images"
               onChange={prepareUserCheckboxes}
-              checked={addUserBody.can_post_images}
+              checked={editUserBody.can_post_images}
               class="h-[33px] w-[33px] mr-2"
             />
             <span>Kan posta bilder?</span>
@@ -330,7 +408,7 @@ function AddUser({ isLoggedIn }) {
               type="checkbox"
               id="can_put_images"
               onChange={prepareUserCheckboxes}
-              checked={addUserBody.can_put_images}
+              checked={editUserBody.can_put_images}
               class="h-[33px] w-[33px] mr-2"
             />
             <span>Kan ändra bilder?</span>
@@ -340,24 +418,24 @@ function AddUser({ isLoggedIn }) {
               type="checkbox"
               id="can_delete_images"
               onChange={prepareUserCheckboxes}
-              checked={addUserBody.can_delete_images}
+              checked={editUserBody.can_delete_images}
               class="h-[33px] w-[33px] mr-2"
             />
             <span>Kan radera bilder?</span>
           </div>
         </div>
         <p className="text-red-500 text-center lg:text-left font-bold">
-          {msg.erroradduser}
+          {msg.errorupdateuser}
         </p>
         <p className="text-green-500 text-center lg:text-left font-bold">
-          {msg.successadduser}
+          {msg.successupdateuser}
         </p>
         <div className="flex justify-center gap-10">
           <button
-            onClick={addUserClick}
+            onClick={editUserClick}
             type="submit"
             className="bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-4 rounded-lg mr-2">
-            Skapa användare
+            Spara ändringar
           </button>
           <button
             onClick={goBack}
@@ -370,4 +448,4 @@ function AddUser({ isLoggedIn }) {
   );
 }
 
-export default AddUser;
+export default EditUser;

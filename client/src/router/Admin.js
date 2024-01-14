@@ -108,7 +108,7 @@ function ActiveUser({ user, onDelete }) {
         <td className="py-1 px-2">
           <div className="flex justify-center items-center">
             <button className="bg-green-800 hover:bg-green-500 text-white font-semibold p-2 m-1 rounded-lg inline-block">
-              Hantera
+              <Link to={`/admin/edituser/${user.userid}`}>Hantera</Link>
             </button>
             <button
               onClick={deleteClick}
