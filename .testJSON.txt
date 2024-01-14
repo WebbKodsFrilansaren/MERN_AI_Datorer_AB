@@ -45,26 +45,3 @@
     "componentstatus": true,
     "componentcategories": ["Tillbehör"]
 }
-
-
-
-
-
-
-
-{
-  "userid": 4,
-  "username": "ewamarklund",
-  "useremail": "ewa.marklund4@aidatorer.se",
-  "userfullname": "Ewa Marklund",
-  "access_token": "8X4povMjx2...",
-  "refresh_token": "jn6I42KRLi...",
-  "account_blocked": "Nej",
-  "account_activated": "Ja",
-  "roles": [
-    "get_images",
-    "delete_images",
-    "put_components"
-  ],
-  "last_login": "2023-01-25"
-}
