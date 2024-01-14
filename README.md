@@ -13,7 +13,7 @@
 
    - Parametrar för MongoDB databas och dess kollektioner är redan färdigkonfigurerade. _VIKTIGT:_ Kör `npm install dotenv -g` så att dotenv-paketet installeras globalt. Annars kanske det "krånglar" med att hitta .env-variablerna.
 
-3. GÅ IN I RÄTT MAPP: Skriv sedan i samma Terminal:`npm run installall` i mappen där repo klonades (både server & frontend installeras nu).
+3. _GÅ IN I RÄTT MAPP:_ Skriv sedan i samma Terminal:`npm run installall` i mappen där repo klonades (både server & frontend installeras nu).
 
 4. Skriv i Terminal i klonade huvudmappen:`npm run installimages` för att återställa/kopiera nya bilder från backup-mappen (sker på serversidan). Dessa hamnar då i `/server/images/{componentid}`.
 
@@ -23,11 +23,11 @@
 
 7. Öppna nu ny Terminal (kontrollera ) och skriv i den:`npm run startclient` så startas ReactJS-appen (körs på localhost:3000).
 
-8. Besök nu http://localhost:3000/ för fullständig MERN-upplevelse!
+8. Besök nu http://localhost:3000/ för fullständig MERN-upplevelse och/eller kör i Thunderclient/POSTMAN om så istället önskas!
 
 ### Inloggning
 
-Kontot med fullständig åtkomst som kan skapa nya användare utöver vanlig registrering har följande inloggningsuppgifter:
+Kontot med fullständig åtkomst som kan skapa nya användare utöver vanlig registrering har följande inloggningsuppgifter (efter att `npm run installmongodb` framgångsrikt har körts):
 
 - Användare: sysadmin
 - Lösenord: superAdmin1337
@@ -72,7 +72,7 @@ Alla REST API endpoints följer formatet `localhost:5000/api/{CRUD endpoint}`. D
 
 ### Users
 
-_OBS:_ Endast användaren 'sysadmin' kan använda dessa endpoints nedan!
+_OBS:_ Endast användaren _'sysadmin'_ kan använda dessa endpoints nedan!
 
 #### GET - Users
 
