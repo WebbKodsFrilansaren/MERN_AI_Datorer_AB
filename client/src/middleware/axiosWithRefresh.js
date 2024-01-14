@@ -13,12 +13,15 @@ const useAxiosWithRefresh = () => {
     baseURL: BASEURL,
   });
 
-  // This intercepts every Request used with `axiosWithRefresh` and then refreshes access_token
-  // by sending the refresh_token (stored httpOnly secured cookie) to user. When refresh_token is
-  // outdated it will send user to login page instead.
+  //This intercepts every Request used with `axiosWithRefresh` and then refreshes access_token
+  //by sending the refresh_token (stored httpOnly secured cookie) to user. When refresh_token is
+  //outdated it will send user to login page instead.
   axiosWithRefresh.interceptors.request.use(
     async (config) => {
       // Do we need access_token?
+      console.log(config);
+      const jwt = config.headers.Authorization.split(" ")[1];
+      console.log(jwt);
       if (config.headers.Authorization) {
         try {
           // Try refresh access_token

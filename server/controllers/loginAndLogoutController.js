@@ -59,7 +59,7 @@ const loginPOST = async (req, res) => {
           },
           process.env.ACCESS_TOKEN,
           {
-            expiresIn: "1d", // CHANGE BACK TO 90 S!
+            expiresIn: "90s", // CHANGE BACK TO 90 S!
           }
         );
         // Now create JWT Token and sign it using REFRESH_TOKEN
