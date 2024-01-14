@@ -5,7 +5,7 @@ import Footer from "./components/Footer";
 import { useState, useEffect } from "react";
 
 // Routing and router components
-import { Route, Routes, useNavigate } from "react-router-dom";
+import { Route, Routes } from "react-router-dom";
 import Login from "./router/Login";
 import Register from "./router/Register";
 import Start from "./router/Start";
