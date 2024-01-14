@@ -57,133 +57,85 @@ function AddUser({ isLoggedIn }) {
 
   // Handle Add Product Click
   const addUserClick = async (e) => {
-    console.log(e);
+    console.log();
     // Prevent default, reset (error) messages
     e.preventDefault();
     setMsgs((prev) => {
       return {
-        erroraddproduct: "",
-        successaddproduct: "",
-        errcomponentname: "",
-        errcomponentdescription: "",
-        errcomponentcategories: "",
-        errcomponentprice: "",
-        errcomponentamount: "",
-        errcomponentstatus: "",
+        erroradduser: "",
+        successadduser: "",
+        errusername: "",
+        erremail: "",
+        errfullname: "",
+        errpassword: "",
+        erraccount_activated: "",
+        erraccount_blocked: "",
+        errcan_get_images: "",
+        errcan_get_components: "",
+        errcan_put_images: "",
+        errcan_put_components: "",
+        errcan_post_images: "",
+        errcan_post_components: "",
+        errcan_delete_images: "",
+        errcan_delete_components: "",
       };
     });
     // Then check fields are not empty
-    if (addUserBody.componentname.trim() === "") {
+    if (addUserBody.username.trim() === "") {
       setMsgs((prev) => {
-        return { ...prev, errcomponentname: "Ange ett namn för komponenten!" };
+        return { ...prev, errusername: "Ange ett användarnamn!" };
       });
     }
-    if (addUserBody.componentdescription.trim() === "") {
+    if (addUserBody.fullname.trim() === "") {
       setMsgs((prev) => {
-        return {
-          ...prev,
-          errcomponentdescription: "Ange en beskrivning för komponenten!",
-        };
+        return { ...prev, errfullname: "Ange ett fullständigt namn!" };
       });
     }
-    if (addUserBody.componentprice === "") {
+    if (addUserBody.email.trim() === "") {
       setMsgs((prev) => {
-        return {
-          ...prev,
-          errcomponentprice: "Ange ett pris för komponenten!",
-        };
+        return { ...prev, erremail: "Ange en e-post!" };
       });
     }
-    if (addUserBody.componentamount === "") {
+    if (addUserBody.password.trim() === "") {
       setMsgs((prev) => {
-        return {
-          ...prev,
-          errcomponentamount: "Ange ett antal för komponenten!",
-        };
+        return { ...prev, errpassword: "Ange ett lösenord!" };
       });
-    }
-    if (addUserBody.componentcategories === "") {
-      setMsgs((prev) => {
-        return {
-          ...prev,
-          errcomponentcategories: "Ange färst en kategori för komponenten!",
-        };
-      });
-    }
-    // Check correct category splitting
-    if (
-      (addUserBody.componentcategories.trim() !== "" &&
-        (addUserBody.componentcategories.includes(" ") ||
-          addUserBody.componentcategories.includes(", "))) ||
-      addUserBody.componentcategories.endsWith(",")
-    ) {
-      setMsgs((prev) => {
-        return {
-          ...prev,
-          errcomponentcategories:
-            "Separera endast med ',' per kategori och inget mellanslag eller annat!",
-        };
-      });
-      return;
     }
 
     // Only POST request when ALL fields are NOT empty!
     if (
-      addUserBody.componentname !== "" &&
-      addUserBody.componentdescription !== "" &&
-      addUserBody.componentprice !== "" &&
-      addUserBody.componentamount !== "" &&
-      addUserBody.componentcategories !== "" &&
-      addUserBody.componentstatus !== ""
+      addUserBody.username !== "" &&
+      addUserBody.email !== "" &&
+      addUserBody.fullname !== "" &&
+      addUserBody.password !== ""
     ) {
       // Now make POST!
       // ALL OK HERE SO PREPARE PUT REQUEST!
       try {
-        // Turn categories to an array even if it is a single one!
-        let categories;
-        if (addUserBody.componentcategories.includes(",")) {
-          categories = addUserBody.componentcategories.split(",");
-        } else {
-          categories = [addUserBody.componentcategories.trim()];
-        }
-        const formData = new FormData();
-
-        // Prepare POST Req
-        const postReq = {
-          componentname: addUserBody.componentname,
-          componentdescription: addUserBody.componentdescription,
-          componentprice: addUserBody.componentprice,
-          componentamount: addUserBody.componentamount,
-          componentcategories: categories,
-          componentstatus: addUserBody.componentstatus === "Ny" ? true : false,
-        };
-        // Add them through object iteration
-        for (const [key, value] of Object.entries(postReq)) {
-          formData.append(key, value);
-        }
-
-        // Make POST Request
-        const res = await axiosWithRefresh.post(`/pccomponents`, formData, {
+        // Make POST Request "addUserBody" is already correct by now!
+        const res = await axiosWithRefresh.post(`/users`, addUserBody, {
           validateStatus: () => true,
           headers: { Authorization: `Bearer ${aToken}` },
         });
-        // When success updating product
-        if (res.status === 200) {
-          setMsgs({ successaddproduct: res.data.success });
+        // When success adding user
+        if (res.status === 201) {
+          setMsgs({
+            successadduser: res.data.success + " Går till adminsidan...",
+          });
           setTimeout(() => {
-            setMsgs({ successaddproduct: "" });
-            navigate("/products");
+            setMsgs({ successadduser: "" });
+            navigate("/admin");
           }, 3333);
         } // Show error messages
         else {
           setMsgs({
-            erroraddproduct:
-              res.data?.error || "Misslyckades att lägga upp komponenten!",
+            erroradduser:
+              res.data?.error || "Misslyckades att skapa användaren!",
           });
         }
       } catch (err) {
         setMsgs({
-          erroraddproduct: "Kontakta Webbutvecklaren för klienthjälp. Bugg!",
+          erroradduser: "Kontakta Webbutvecklaren för klienthjälp. Bugg!",
         });
       }
     }
@@ -206,6 +158,16 @@ function AddUser({ isLoggedIn }) {
     }
   };
 
+  // Change userBody but only its checkboxes
+  const prepareUserCheckboxes = (e) => {
+    const { id, checked } = e.target;
+    if (e.target.id === id) {
+      setAddUserBody((prev) => {
+        return { ...prev, [id]: checked };
+      });
+    }
+  };
+
   /* JSX */
   // If not allowed to edit products
   // You need full access to even have any access!
@@ -218,7 +180,7 @@ function AddUser({ isLoggedIn }) {
     return (
       <div className="text-center text-lg">
         <p className="text-red-500 font-bold px-4 text-center">
-          Du saknar behörighet att hantera användare! Hur ser du detta ens som?
+          Du saknar behörighet att skapa användare! Hur ser du detta ens som?
         </p>
         <button
           onClick={goBack}
@@ -236,94 +198,152 @@ function AddUser({ isLoggedIn }) {
       <form className="space-y-4">
         <div>
           <label
-            htmlFor="componentadded"
-            className="block text-sm font-bold text-gray-600 mb-2"></label>
-          <label
-            htmlFor="componentname"
+            htmlFor="username"
             className="block text-sm font-bold text-gray-600">
-            Namn:
+            Användarnamn:
           </label>
           <input
             onChange={prepareUserBody}
             type="text"
-            id="componentname"
+            id="username"
             className="mt-1 p-2 w-full border rounded-md"
           />
-          <p className="text-red-500 font-bold">{msg.errcomponentname}</p>
+          <p className="text-red-500 font-bold">{msg.errusername}</p>
         </div>
         <div>
           <label
-            htmlFor="componentdescription"
+            htmlFor="email"
             className="block text-sm font-bold text-gray-600">
-            Beskrivning:
+            E-post:
           </label>
-          <textarea
+          <input
             onChange={prepareUserBody}
-            type="text"
-            id="componentdescription"
+            type="email"
+            id="email"
             className="mt-1 p-2 w-full border rounded-md"
           />
-          <p className="text-red-500 font-bold">
-            {msg.errcomponentdescription}
-          </p>
+          <p className="text-red-500 font-bold">{msg.erremail}</p>
         </div>
         <div>
           <label
-            htmlFor="componentprice"
+            htmlFor="fullname"
             className="block text-sm font-bold text-gray-600">
-            Pris (kr):
-          </label>
-          <input
-            onChange={prepareUserBody}
-            type="number"
-            id="componentprice"
-            className="mt-1 p-2 w-40 border rounded-md"
-          />
-          <p className="text-red-500 font-bold">{msg.errcomponentprice}</p>
-        </div>
-        <div>
-          <label
-            htmlFor="componentamount"
-            className="block text-sm font-bold text-gray-600">
-            Antal (st):
-          </label>
-          <input
-            onChange={prepareUserBody}
-            type="number"
-            id="componentamount"
-            className="mt-1 p-2 w-40 border rounded-md"
-          />
-          <p className="text-red-500 font-bold">{msg.errcomponentamount}</p>
-        </div>
-        <div>
-          <label
-            htmlFor="componentcategories"
-            className="block text-sm font-bold text-gray-600">
-            Kategorier (separera endast med ett komma &amp; per kategori):
+            Fullständigt namn:
           </label>
           <input
             onChange={prepareUserBody}
             type="text"
-            id="componentcategories"
+            id="fullname"
             className="mt-1 p-2 w-full border rounded-md"
           />
-          <p className="text-red-500 font-bold">{msg.errcomponentcategories}</p>
+          <p className="text-red-500 font-bold">{msg.errfullname}</p>
         </div>
         <div>
           <label
-            htmlFor="componentstatus"
+            htmlFor="password"
             className="block text-sm font-bold text-gray-600">
-            Skick:
+            Lösenord:
           </label>
-          <select
+          <input
             onChange={prepareUserBody}
-            type="text"
-            id="componentstatus"
-            className="mt-1 p-2 w-40 border rounded-md">
-            <option value="Ny">Ny</option>
-            <option value="Begagnad">Begagnad</option>
-          </select>
-          <p className="text-red-500 font-bold">{msg.errcomponentstatus}</p>
+            type="password"
+            id="password"
+            className="mt-1 p-2 w-full border rounded-md"
+          />
+          <p className="text-red-500 font-bold">{msg.errpassword}</p>
+        </div>
+        <p className="block text-sm font-bold text-gray-600">Behörigheter:</p>
+        <div className="flex flex-wrap gap-4">
+          <div class="flex items-center mt-2">
+            <input
+              type="checkbox"
+              id="account_activated"
+              onChange={prepareUserCheckboxes}
+              checked={addUserBody.account_activated}
+              class="h-[33px] w-[33px] mr-2"
+            />
+            <span>Aktiverat konto?</span>
+          </div>
+          <div class="flex items-center mt-2">
+            <input
+              type="checkbox"
+              id="can_get_components"
+              onChange={prepareUserCheckboxes}
+              checked={addUserBody.can_get_components}
+              class="h-[33px] w-[33px] mr-2"
+            />
+            <span>Kan visa produkter?</span>
+          </div>
+          <div class="flex items-center mt-2">
+            <input
+              type="checkbox"
+              id="can_post_components"
+              onChange={prepareUserCheckboxes}
+              checked={addUserBody.can_post_components}
+              class="h-[33px] w-[33px] mr-2"
+            />
+            <span>Kan skapa produkter?</span>
+          </div>
+          <div class="flex items-center mt-2">
+            <input
+              type="checkbox"
+              id="can_put_components"
+              onChange={prepareUserCheckboxes}
+              checked={addUserBody.can_put_components}
+              class="h-[33px] w-[33px] mr-2"
+            />
+            <span>Kan ändra produkter?</span>
+          </div>
+          <div class="flex items-center mt-2">
+            <input
+              type="checkbox"
+              id="can_delete_components"
+              onChange={prepareUserCheckboxes}
+              checked={addUserBody.can_delete_components}
+              class="h-[33px] w-[33px] mr-2"
+            />
+            <span>Kan radera produkter?</span>
+          </div>
+          <div class="flex items-center mt-2">
+            <input
+              type="checkbox"
+              id="can_get_images"
+              onChange={prepareUserCheckboxes}
+              checked={addUserBody.can_get_images}
+              class="h-[33px] w-[33px] mr-2"
+            />
+            <span>Kan visa bilder?</span>
+          </div>
+          <div class="flex items-center mt-2">
+            <input
+              type="checkbox"
+              id="can_post_images"
+              onChange={prepareUserCheckboxes}
+              checked={addUserBody.can_post_images}
+              class="h-[33px] w-[33px] mr-2"
+            />
+            <span>Kan posta bilder?</span>
+          </div>
+          <div class="flex items-center mt-2">
+            <input
+              type="checkbox"
+              id="can_put_images"
+              onChange={prepareUserCheckboxes}
+              checked={addUserBody.can_put_images}
+              class="h-[33px] w-[33px] mr-2"
+            />
+            <span>Kan ändra bilder?</span>
+          </div>
+          <div class="flex items-center mt-2">
+            <input
+              type="checkbox"
+              id="can_delete_images"
+              onChange={prepareUserCheckboxes}
+              checked={addUserBody.can_delete_images}
+              class="h-[33px] w-[33px] mr-2"
+            />
+            <span>Kan radera bilder?</span>
+          </div>
         </div>
         <p className="text-red-500 text-center lg:text-left font-bold">
           {msg.erroradduser}
@@ -338,7 +358,6 @@ function AddUser({ isLoggedIn }) {
             className="bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-4 rounded-lg mr-2">
             Skapa användare
           </button>
-
           <button
             onClick={goBack}
             className="block bg-black hover:bg-gray-500 text-white font-bold py-3 px-4 rounded-lg">

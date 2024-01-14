@@ -274,7 +274,7 @@ function Admin({ isLoggedIn }) {
         } else {
           setMsgs({
             errFetchUsers:
-              res.data?.error || "Fel uppstod vid hämtning av produkter!",
+              res.data?.error || "Fel uppstod vid hämtning av användare!",
           });
         }
       });
@@ -302,7 +302,8 @@ function Admin({ isLoggedIn }) {
   }
 
   // When no users or not allowed
-  if (users === null) return <div>LADDAR ANVÄNDARE...</div>;
+  if (users === null)
+    return <div>LADDAR ANVÄNDARE... {msgs.errFetchUsers}</div>;
   if (users === false)
     return (
       <div className="text-center text-lg">
@@ -338,7 +339,7 @@ function Admin({ isLoggedIn }) {
         <Link to="/admin/adduser">+ Ny användare</Link>
       </button>
       <section>
-        <h2 className="text-3xl font-bold text-center mb-4">
+        <h2 className="text-3xl mt-4 font-bold text-left mb-4">
           Ej aktiverade registrerade användare
         </h2>
         <div className="overflow-x-auto mb-8">
@@ -376,7 +377,7 @@ function Admin({ isLoggedIn }) {
       </section>
 
       <section>
-        <h2 className="text-3xl font-bold text-center mb-4">
+        <h2 className="text-3xl font-bold text-left mb-4">
           Aktiverade registrerade användare
         </h2>
         <div className="overflow-x-auto mb-8">

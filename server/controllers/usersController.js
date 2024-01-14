@@ -259,6 +259,8 @@ const postSingleUser = async (req, res) => {
       usernamelc: req.body.username.toLowerCase(),
       account_blocked: req.body.account_blocked ? true : false,
       account_activated: req.body.account_activated ? true : false,
+      access_token: "",
+      refresh_token: "",
       roles: roles,
       last_login: "",
       userid: nextUserId,

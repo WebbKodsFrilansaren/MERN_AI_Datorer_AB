@@ -45,17 +45,23 @@ function Product({ products, onDelete }) {
       />
       {/* IMAGES DIV */}
       <div className="w-full h-48 object-cover mb-4 rounded border relative">
-        {products.componentImages.length > 0 && (
-          <img
-            onClick={nextImage}
-            alt={products.componentName}
-            className="w-full h-full object-cover rounded cursor-pointer hover:outline"
-            src={`${IMGURL}/${products.componentid}/${products.componentImages[selectedImageIndex]}`}
-          />
-        )}
+        {products.componentImages.length > 0 &&
+          accesses.includes("get_images") && (
+            <img
+              onClick={nextImage}
+              alt={products.componentName}
+              className="w-full h-full object-cover rounded cursor-pointer hover:outline"
+              src={`${IMGURL}/${products.componentid}/${products.componentImages[selectedImageIndex]}`}
+            />
+          )}
         {products.componentImages.length === 0 && (
           <p class="translate-x-[25%] translate-y-[300%] text-red-500 font-bold">
             INGA BILDER TILLAGDA!
+          </p>
+        )}
+        {!accesses.includes("get_images") && (
+          <p class="translate-x-[25%] translate-y-[300%] text-red-500 font-bold">
+            BEHÖRIGHET SAKNAS!
           </p>
         )}
       </div>

@@ -344,9 +344,6 @@ function AddProduct({ isLoggedIn }) {
       <form className="space-y-4">
         <div>
           <label
-            htmlFor="componentadded"
-            className="block text-sm font-bold text-gray-600 mb-2"></label>
-          <label
             htmlFor="componentname"
             className="block text-sm font-bold text-gray-600">
             Namn:
