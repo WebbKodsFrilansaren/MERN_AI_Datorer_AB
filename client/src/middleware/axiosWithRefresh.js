@@ -18,13 +18,28 @@ const useAxiosWithRefresh = () => {
   //outdated it will send user to login page instead.
   axiosWithRefresh.interceptors.request.use(
     async (config) => {
-      // Do we need access_token?
-      console.log(config);
+      // Has our access_token expired? Grab it, convert from base64
+      // and grab the "exp" property and compare to current time.
+      let timeLeft;
+      const timeNow = new Date();
       const jwt = config.headers.Authorization.split(" ")[1];
-      console.log(jwt);
-      if (config.headers.Authorization) {
+      // If there is access_token
+      if (!jwt == "") {
+        const [, payload] = jwt.split(".");
+        console.log(jwt);
+        const decodedPayload = atob(payload);
+        const payloadObj = JSON.parse(decodedPayload);
+        const expTime = parseInt(payloadObj.exp);
+        timeLeft = new Date(expTime * 1000);
+      } // no access_token means they shouldn't be able to refresh access_token
+      else {
+        timeLeft = 1;
+      }
+      // If access_token has expired, try renew it!
+      if (timeLeft < timeNow) {
         try {
           // Try refresh access_token
+          console.log("ACCESS_TOKEN LÖPT UT! UPPDATERAR");
           const refreshedToken = await refreshAccessToken();
           // If we succeed we can set new Bearer token and the global `aToken`
           // using setAToken (its setter)
