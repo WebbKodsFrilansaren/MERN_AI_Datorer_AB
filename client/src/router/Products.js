@@ -7,8 +7,9 @@ import ModalDeleteProduct from "../components/ModalDeleteProduct";
 const IMGURL = "http://localhost:5000/images";
 
 // Each separate Product
-function Product({ products, accesses, onDelete }) {
+function Product({ products, onDelete }) {
   const [isModalOpen, setModalOpen] = useState(false); // Delete modal
+  const { aToken, accesses } = useContext(AuthContext);
   const navigate = useNavigate();
   // Open delete modal
   const deleteClick = () => {
@@ -78,10 +79,16 @@ function Product({ products, accesses, onDelete }) {
         <span className="font-bold">Skick: </span>
         {products.componentStatus} st
       </p>
-      <p className="mb-2">
+      <p>
         <span className="font-bold">Antal: </span>
         {products.componentAmount} st
       </p>
+      {products.componentImages.length > 0 && (
+        <p className="mb-2">
+          <span className="font-bold">Bilder: </span>
+          {products.componentImages.length} st
+        </p>
+      )}
       {accesses.includes("put_components") && (
         <button
           onClick={() => navigate(`/products/${products.componentid}/edit`)}
