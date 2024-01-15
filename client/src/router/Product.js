@@ -120,17 +120,31 @@ function Product({ isLoggedIn }) {
     );
   else if (singleProduct === false)
     return (
-      <p className="text-red-500 font-bold px-4 text-center">
-        Du saknar behörighet att visa enskilda produkter!
-      </p>
+      <>
+        <p className="text-red-500 font-bold px-4 text-center">
+          Du saknar behörighet att visa enskilda produkter!
+        </p>
+        <button
+          onClick={goBack}
+          className="bg-black hover:bg-gray-500 text-white font-semibold p-2 m-1 rounded-lg">
+          Tillbaka
+        </button>
+      </>
     );
 
   // When no access to it
   if (!accesses.includes("get_components")) {
     return (
-      <p className="text-red-500 text-center font-extrabold px-4">
-        Du saknar behörighet att se komponenter!
-      </p>
+      <>
+        <p className="text-red-500 text-center font-extrabold px-4">
+          Du saknar behörighet att se komponenter!
+        </p>
+        <button
+          onClick={goBack}
+          className="bg-black hover:bg-gray-500 text-white font-semibold p-2 m-1 rounded-lg">
+          Tillbaka
+        </button>
+      </>
     );
   }
   return (
