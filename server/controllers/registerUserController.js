@@ -56,7 +56,6 @@ const registerUser = async (req, res) => {
     // Insert user (user must login to get access_token & refresh_token)
     // Standard new user gets ["get_images","get_components"]
     const insertUser = await dbColUsers.insertOne({
-      userid: nextUserId,
       username: username,
       usernamelc: usernamelc,
       useremail: useremail,
@@ -85,6 +84,7 @@ const registerUser = async (req, res) => {
       account_blocked: false,
       account_activated: username === "sysadmin" ? true : false,
       last_login: "",
+      userid: nextUserId,
     });
     // Check if successful
     if (insertUser) {
