@@ -12,6 +12,7 @@ const registerUser = async (req, res) => {
   const password = req.body.password;
 
   // Init MongoDB
+  let nextUserId = 1;
   let client;
   try {
     // Then grab maka2207 database and its collection "users"
@@ -40,9 +41,22 @@ const registerUser = async (req, res) => {
     // All OK so prepare hashed password!
     const hashedPassword = await bcrypt.hash(password, 10);
 
+    // Find highest current value of `userid` by sorting it from max value and just
+    const highestUserId = await dbColUsers
+      .find()
+      .sort({ userid: -1 })
+      .limit(1)
+      .next();
+
+    // If DOES exist then nextUserId is that plus one, otherwise it is the first user!
+    if (highestUserId) {
+      nextUserId = highestUserId.userid + 1;
+    }
+
     // Insert user (user must login to get access_token & refresh_token)
     // Standard new user gets ["get_images","get_components"]
     const insertUser = await dbColUsers.insertOne({
+      userid: nextUserId,
       username: username,
       usernamelc: usernamelc,
       useremail: useremail,
