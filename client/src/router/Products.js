@@ -203,6 +203,7 @@ function Products({ isLoggedIn }) {
         } else if (res.status === 404 || res.status === 403) {
           setProducts(false);
         } else {
+          setProducts(false);
           setMsgs({
             errFetchProduct:
               res.data?.error || "Fel uppstod vid hämtning av produkter!",
@@ -213,7 +214,7 @@ function Products({ isLoggedIn }) {
 
   // Update filtered products based on changed value in products (for example you delete a product)
   useEffect(() => {
-    if (products !== null) {
+    if (products !== null && products !== false) {
       const filtered = products.filter((product) =>
         product.componentName.toLowerCase().includes(search.toLowerCase())
       );
@@ -292,7 +293,7 @@ function Products({ isLoggedIn }) {
           ))}
         </div>
       )}
-      {filteredProducts.length > 0 && search !== "" && (
+      {!products && filteredProducts.length > 0 && search !== "" && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {filteredProducts.map((product, index) => (
             <Product
@@ -304,7 +305,7 @@ function Products({ isLoggedIn }) {
           ))}
         </div>
       )}
-      {filteredProducts.length === 0 && search !== "" && (
+      {products && filteredProducts.length === 0 && search !== "" && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           <p className="text-red-500 font-bold text-center">
             Inga produkter matchar sökningen '{search}'!
