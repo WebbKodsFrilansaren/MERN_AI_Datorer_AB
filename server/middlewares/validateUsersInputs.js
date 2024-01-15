@@ -831,7 +831,6 @@ const putSinglePccomponent = async (req, res, next) => {
   const isInteger2 = /^[0-9]+$/.test(req.body.componentprice);
   if (
     !req.body.componentprice ||
-    typeof req.body.componentprice !== "number" ||
     isNaN(req.body.componentprice) ||
     !isInteger2
   ) {
@@ -843,7 +842,7 @@ const putSinglePccomponent = async (req, res, next) => {
   // CHECKS for "componentamount"
   if (
     !Object.hasOwn(req.body, "componentamount") ||
-    typeof req.body?.componentamount !== "number"
+    typeof req.body?.componentamount !== "string"
   ) {
     return res.status(422).json({ error: "Ange komponentens antal i heltal!" });
   }
@@ -853,11 +852,7 @@ const putSinglePccomponent = async (req, res, next) => {
       .json({ error: "Komponentens antal får inte vara lägre än 0!" });
   }
   const isInteger3 = /^[0-9]+$/.test(req.body.componentamount);
-  if (
-    typeof req.body.componentamount !== "number" ||
-    isNaN(req.body.componentamount) ||
-    !isInteger3
-  ) {
+  if (isNaN(req.body.componentamount) || !isInteger3) {
     return res
       .status(422)
       .json({ error: "Komponentens antal ska vara ett heltal!" });
