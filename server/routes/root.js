@@ -65,7 +65,7 @@ router.all("*", (req, res) => {
   if (req.headers.accept.includes("html")) {
     return res.sendFile(path.join(__dirname, "../images", "easteregg.jpg"));
   }
-  return res.status(400).json({ error: `Ogiltigt REST API-anrop! <root.js>` });
+  return res.status(400).json({ error: `Ogiltigt REST API-anrop!` });
 });
 
 // Export it so it can be used by `app.js` in root folder.

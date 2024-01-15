@@ -26,7 +26,6 @@ const useAxiosWithRefresh = () => {
       // If there is access_token
       if (!jwt == "") {
         const [, payload] = jwt.split(".");
-        console.log(jwt);
         const decodedPayload = atob(payload);
         const payloadObj = JSON.parse(decodedPayload);
         const expTime = parseInt(payloadObj.exp);

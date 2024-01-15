@@ -49,6 +49,14 @@ const loginPOST = async (req, res) => {
           error: "Användarnamn och/eller lösenord är fel!",
         });
       }
+      // Deny login if user's account is not activated
+      if (correctUser.account_activated === false) {
+        client.close();
+        return res.status(403).json({
+          error:
+            "Konto inaktiverat - be Systemadministratören aktivera det först!",
+        });
+      }
       // Correct password after check!
       if (result) {
         // Now create JWT Token and sign it using ACCESS_TOKEN
