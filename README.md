@@ -1,17 +1,17 @@
-# HT2023 DT162G Datateknik GR (B), Javascriptbaserad webbutveckling, 7,5 hp (distans) - PROJEKT - WebbKodsLärlingen (maka2207)
+# (A) HT2023 DT162G Datateknik GR (B), Javascriptbaserad webbutveckling, 7,5 hp (distans) - PROJEKT - WebbKodsFrilansaren (tidigare WebbKodsLärlingen) (maka2207)
 
-# VIKTIGT: Ja, du ska ALDRIG ladda upp .env i rotmappen i detta repo. Detta är bara för "angelägenhetens skull" denna gång också.
+# VIKTIGT: Ja, du ska ALDRIG ladda upp .env i rotmappen i detta repo. Nu är det för att "enkelt kunna testköra lokalt".
 
 ## KOM IGÅNG LOKALT
 
 - SÄKER REST API-SERVER KÖRS PÅ: localhost:5000
 - KLIENT KÖRS PÅ: localhost:3000
 
-1. Öppna VSCode och välj mapp, öppna sedan Terminal och skriv:`git clone https://github.com/WebbkodsFrilansaren/dt162g-projekt-maka2207.git`.
+1. Öppna VSCode och välj mapp, öppna sedan Terminal och skriv:`git clone https://github.com/WebbKodsFrilansaren/MERN_AI_Datorer_AB.git`.
 
-2. Konfigurera så att MongoDB är redo att köras lokalt (på mongodb://localhost:27017).
+2. Konfigurera så att MongoDB på din dator är redo att köras lokalt (på mongodb://localhost:27017).
 
-   - Parametrar för MongoDB databas och dess kollektioner är redan färdigkonfigurerade. _VIKTIGT:_ Kör `npm install dotenv -g` så att dotenv-paketet installeras globalt. Annars kanske det "krånglar" med att hitta .env-variablerna.
+   - Parametrar för MongoDB databas och dess kollektioner är redan färdigkonfigurerade. _VIKTIGT:_ Kör `npm install dotenv -g` så att dotenv-paketet installeras globalt. Annars kanske det "krånglar" med att hitta .env-variablerna. ExpressJS-servern använder nämligen de hårdkodade parametrarna i .env-filen!
 
 3. _GÅ IN I RÄTT MAPP:_ Skriv sedan i samma Terminal:`npm run installall` i mappen där repo klonades (både server & frontend installeras nu).
 
