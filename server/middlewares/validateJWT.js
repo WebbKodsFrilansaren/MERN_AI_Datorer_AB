@@ -32,6 +32,7 @@ const validateAccessToken = async (req, res, next) => {
   try {
     // IMPORTANT: jwt.verify will FAIL if access token has expired despite being otherwise correct!
     const decoded = jwt.verify(aToken, tokenKey);
+    console.log(decoded);
 
     // Also validate correct issuer
     if (decoded.iss !== "AI Datorer AB") {
@@ -66,11 +67,17 @@ const validateAccessToken = async (req, res, next) => {
         return res.status(403).json({ error: "Åtkomst nekad!" });
       }
     } catch (e) {
-      return res.status(403).json({ error: "[VALIDATEJWT] Åtkomst nekad!" });
+      return res.status(403).json({
+        error:
+          "[VALIDATEJWT] Åtkomst nekad! JWT i databas är fel eller misslyckades!",
+      });
     }
   } catch (e) {
     // Invalid or expired access token
-    return res.status(403).json({ error: "[VALIDATEJWT] Åtkomst nekad!" });
+    return res.status(403).json({
+      error:
+        "[VALIDATE JWT] Åtkomst nekad! jwt.verify eller if-sats misslyckades!",
+    });
   }
 };
 // Export for use!

@@ -69,25 +69,29 @@ const refreshAToken = async (req, res) => {
           console.log("REFRESH_TOKEN HAR FÖRNYATS!");
           client.close();
           return res.status(200).json({
-            success: "Åtkomstförnyelse lyckades!",
+            success: "[SUCCESS]Åtkomstförnyelse lyckades!",
             accessToken: accessToken,
           });
         }
       } catch (err) {
         // When failing to update access_token for `user`
         return res.status(500).json({
-          error: "Åtkomstförnyelse misslyckades!",
+          error:
+            "[Failed to update access_token in DB]Åtkomstförnyelse misslyckades!",
         });
       }
     } catch (err) {
       // When failing to verify refresh_token
       return res.status(500).json({
-        error: "Åtkomstförnyelse misslyckades!",
+        error:
+          "[Failed verifying refresh_token variable]Åtkomstförnyelse misslyckades!",
       });
     }
   } // If jwtcookie not found!
   else {
-    return res.status(403).json({ error: "Åtkomstförnyelse misslyckades!" });
+    return res
+      .status(403)
+      .json({ error: "[No JWT Cookie]Åtkomstförnyelse misslyckades!" });
   }
 };
 

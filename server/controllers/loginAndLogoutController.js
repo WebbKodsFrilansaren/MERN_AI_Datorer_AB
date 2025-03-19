@@ -108,7 +108,7 @@ const loginPOST = async (req, res) => {
           // protected against XSS, can run on other domain (sameSite=none), with maxAge 1 day.
           res.cookie("jwt", refreshToken, {
             httpOnly: true,
-            sameSite: "None",
+            sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
             secure: process.env.NODE_ENV === "production",
             maxAge: 1000 * 60 * 60 * 24,
           });
