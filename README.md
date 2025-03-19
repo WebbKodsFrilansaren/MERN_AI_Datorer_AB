@@ -1,6 +1,6 @@
 # (A) HT2023 DT162G Datateknik GR (B), Javascriptbaserad webbutveckling, 7,5 hp (distans) - PROJEKT - WebbKodsFrilansaren (tidigare WebbKodsLärlingen) (maka2207)
 
-# VIKTIGT: Ja, du ska ALDRIG ladda upp .env i rotmappen i detta repo. Nu är det för att "enkelt kunna testköra lokalt".
+# VIKTIGT: Ja, du ska ALDRIG ladda upp .env-filer eller liknande "secrets"-filer. Nu är det för att "enkelt kunna testköra lokalt" av rekryterare.
 
 ## KOM IGÅNG LOKALT
 
