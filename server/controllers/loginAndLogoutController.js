@@ -191,7 +191,8 @@ const logoutPOST = async (req, res) => {
           // Cookie is not only empty but also expires immediately upon receiving it
           res.clearCookie("jwt", {
             httpOnly: true,
-            sameSite: "None",
+            sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
+            secure: process.env.NODE_ENV === "production",
             maxAge: 1000 * 60 * 60 * 24,
           });
           return res.status(200).json({ success: "Utloggad!" });
