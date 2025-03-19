@@ -2,6 +2,13 @@
 
 # VIKTIGT: Ja, du ska ALDRIG ladda upp .env-filer eller liknande "secrets"-filer. Nu är det för att "enkelt kunna testköra lokalt" av rekryterare.
 
+## Vad är detta?
+
+- Techstack = MERN (MongoDB, ExpressJS, ReactJS, NodeJS) där MongoDB+ExressJS+NodeJS är backend och ReactJS är frontend.
+- Projektet är ett internt inventeringssystem för det fiktiva bolaget AI Datorer AB.
+- Användaren "sysadmin" (skapas automatiskt efter du stegen nedan följts) kan skapa användare med olika behörigheter för att CRUDa inventering av datorkomponenter.
+- CRUDa användare och/eller datorkomponenter. Det går även att söka/filtrera på datorkomponent namn.
+
 ## KOM IGÅNG LOKALT
 
 - SÄKER REST API-SERVER KÖRS PÅ: localhost:5000
