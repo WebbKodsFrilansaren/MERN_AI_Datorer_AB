@@ -7,7 +7,7 @@
 - SÄKER REST API-SERVER KÖRS PÅ: localhost:5000
 - KLIENT KÖRS PÅ: localhost:3000
 
-1. Öppna VSCode och välj mapp, öppna sedan Terminal och skriv:`git clone https://github.com/WebbkodsLarlingen/dt162g-projekt-maka2207.git`.
+1. Öppna VSCode och välj mapp, öppna sedan Terminal och skriv:`git clone https://github.com/WebbkodsFrilansaren/dt162g-projekt-maka2207.git`.
 
 2. Konfigurera så att MongoDB är redo att köras lokalt (på mongodb://localhost:27017).
 
